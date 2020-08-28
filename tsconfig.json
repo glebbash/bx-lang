@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "incremental": true,
+    "target": "es5",
+    "module": "commonjs",
+    "sourceMap": true,
+    "noEmit": true,
+    "strict": true,
+    "rootDirs": ["src", "tests"],
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}

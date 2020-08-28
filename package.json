@@ -1,0 +1,65 @@
+{
+  "name": "blocks",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node tests/eval",
+    "test": "tsc && nyc mocha"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "array-n": "^1.0.0",
+    "ts-node": "^9.0.0"
+  },
+  "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
+    "@types/benchmark": "^1.0.33",
+    "@types/chai": "^4.2.12",
+    "@types/mocha": "^8.0.0",
+    "@types/node": "^14.6.0",
+    "benchmark": "^2.1.4",
+    "chai": "^4.2.0",
+    "mocha": "^8.0.1",
+    "multiline-str": "^1.0.0",
+    "nyc": "^15.1.0",
+    "source-map-support": "^0.5.19",
+    "typescript": "^4.0.2"
+  },
+  "mocha": {
+    "require": [
+      "ts-node/register",
+      "source-map-support/register"
+    ],
+    "recursive": true,
+    "spec": "tests/**.test.ts"
+  },
+  "prettier": {
+    "semi": false,
+    "tabWidth": 4,
+    "trailingComma": "all"
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "commonjs": true,
+      "es6": true
+    },
+    "extends": "eslint:recommended",
+    "globals": {
+      "Atomics": "readonly",
+      "SharedArrayBuffer": "readonly"
+    },
+    "parserOptions": {
+      "ecmaVersion": 2018,
+      "sourceType": "module"
+    },
+    "rules": {
+      "semi": [
+        "error",
+        "never"
+      ]
+    }
+  }
+}
