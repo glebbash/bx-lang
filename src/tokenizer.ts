@@ -1,4 +1,4 @@
-import { syntaxError } from "./utils/syntax-error"
+import { syntaxError } from './utils/syntax-error';
 
 const EOF = null
 type EOF = typeof EOF

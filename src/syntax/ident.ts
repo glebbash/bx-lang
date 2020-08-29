@@ -1,8 +1,8 @@
-import { Blocks } from "../core"
-import { Parser } from "../parser"
-import { Token } from "../tokenizer"
-import { Expression } from "./expression"
-import { PrefixParser } from "./prefix-op"
+import { Blocks } from '../core';
+import { Parser } from '../parser';
+import { Token } from '../tokenizer';
+import { Expression } from './expression';
+import { PrefixParser } from './prefix-op';
 
 export const IDENT_PARSER: PrefixParser<IdentExpr> = {
     parse(_parser: Parser, token: Token) {

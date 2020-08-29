@@ -1,7 +1,7 @@
-import Benchmark from "benchmark"
-import { readFileSync } from "fs"
-import { Tokenizer as T1 } from "../../src/new/tokenizer"
-import { Tokenizer as T2 } from "../../src/new/tokenizer"
+import Benchmark from 'benchmark';
+import { readFileSync } from 'fs';
+
+import { Tokenizer as T1 } from '../../src/new/tokenizer';
 
 const data = readFileSync("data/main.nips", { encoding: "utf-8" })
 

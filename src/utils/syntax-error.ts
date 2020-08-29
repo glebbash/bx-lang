@@ -1,5 +1,5 @@
-import { Token } from "../tokenizer"
-import { panic } from "./panic"
+import { Token } from '../tokenizer';
+import { panic } from './panic';
 
 export class SyntaxError extends Error {
     constructor(message: string, private position: Token["start"]) {

@@ -1,5 +1,5 @@
-import { panic } from "../utils/panic"
-import { BValue } from "./engine"
+import { panic } from '../utils/panic';
+import { BValue } from './engine';
 
 export type Cell = {
     value: BValue

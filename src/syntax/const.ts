@@ -1,8 +1,8 @@
-import { Blocks } from "../core"
-import { Expression } from "./expression"
-import { Parser } from "../parser"
-import { Token } from "../tokenizer"
-import { PrefixParser } from "./prefix-op"
+import { Blocks } from '../core';
+import { Parser } from '../parser';
+import { Token } from '../tokenizer';
+import { Expression } from './expression';
+import { PrefixParser } from './prefix-op';
 
 export const CONST_PARSER: PrefixParser = {
     parse(_parser: Parser, token: Token): Expression {

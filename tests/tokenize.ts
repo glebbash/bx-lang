@@ -1,5 +1,6 @@
-import { Tokenizer } from "../../src/new/tokenizer"
-import { readFileSync } from "fs"
+import { readFileSync } from 'fs';
+
+import { Tokenizer } from '../../src/new/tokenizer';
 
 console.log("start")
 const data = readFileSync("data/test1.new", { encoding: "utf-8" })

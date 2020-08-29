@@ -1,4 +1,4 @@
-import { BHolder, BValue } from "./engine"
+import { BHolder, BValue } from './engine';
 
 export class BNumber extends BHolder<number> {}
 

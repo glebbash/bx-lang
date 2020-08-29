@@ -1,9 +1,9 @@
-import { Expression } from "./expression"
-import { Parser } from "../parser"
-import { Expr, Token } from "../tokenizer"
-import { PrefixParser } from "./prefix-op"
-import { syntaxError } from "../utils/syntax-error"
-import { ConstExpr } from "./const"
+import { Parser } from '../parser';
+import { Expr, Token } from '../tokenizer';
+import { syntaxError } from '../utils/syntax-error';
+import { ConstExpr } from './const';
+import { Expression } from './expression';
+import { PrefixParser } from './prefix-op';
 
 export const PAREN_PARSER: PrefixParser = {
     parse(parser: Parser, token: Token): Expression {

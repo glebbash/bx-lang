@@ -1,8 +1,8 @@
-import { Blocks } from "../core"
-import { Expression } from "./expression"
-import { Parser } from "../parser"
-import { Token } from "../tokenizer"
-import { PostfixParser } from "./postfix-op"
+import { Blocks } from '../core';
+import { Parser } from '../parser';
+import { Token } from '../tokenizer';
+import { Expression } from './expression';
+import { PostfixParser } from './postfix-op';
 
 export const binaryOpParser = (
     precedence: number,

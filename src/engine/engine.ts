@@ -1,6 +1,6 @@
-import { AutoMap } from "../utils/auto-map"
-import { panic } from "../utils/panic"
-import { Scope } from "./scope"
+import { AutoMap } from '../utils/auto-map';
+import { panic } from '../utils/panic';
+import { Scope } from './scope';
 
 export type BMethod = (self: BValue, ...args: BValue[]) => BValue
 export type BMethodBound = (...args: BValue[]) => BValue

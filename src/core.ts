@@ -1,15 +1,15 @@
-import { Engine } from "./engine/engine"
-import { binaryOpParser } from "./syntax/binary-op"
-import { CONST_PARSER } from "./syntax/const"
-import { IDENT_PARSER } from "./syntax/ident"
-import { PANIC_PARSER } from "./syntax/panic"
-import { PostfixParser } from "./syntax/postfix-op"
-import { PrefixParser } from "./syntax/prefix-op"
-import { unaryOpParser } from "./syntax/unary-op"
-import { Parser } from "./parser"
-import { Tokenizer } from "./tokenizer"
-import { PAREN_PARSER } from "./syntax/paren"
-import { LET_PARSER } from "./syntax/let"
+import { Engine } from './engine/engine';
+import { Parser } from './parser';
+import { binaryOpParser } from './syntax/binary-op';
+import { CONST_PARSER } from './syntax/const';
+import { IDENT_PARSER } from './syntax/ident';
+import { LET_PARSER } from './syntax/let';
+import { PANIC_PARSER } from './syntax/panic';
+import { PAREN_PARSER } from './syntax/paren';
+import { PostfixParser } from './syntax/postfix-op';
+import { PrefixParser } from './syntax/prefix-op';
+import { unaryOpParser } from './syntax/unary-op';
+import { Tokenizer } from './tokenizer';
 
 export class Blocks {
     private tokenizer = new Tokenizer()

@@ -1,8 +1,8 @@
-import { Expression } from "./expression"
-import { Parser } from "../parser"
-import { IDENT_PARSER } from "./ident"
-import { PrefixParser } from "./prefix-op"
-import { Blocks } from "../core"
+import { Blocks } from '../core';
+import { Parser } from '../parser';
+import { Expression } from './expression';
+import { IDENT_PARSER } from './ident';
+import { PrefixParser } from './prefix-op';
 
 export const LET_PARSER: PrefixParser<LetExpr> = {
     parse(parser: Parser) {

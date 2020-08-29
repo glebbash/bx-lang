@@ -1,6 +1,6 @@
-import { Expression } from "./expression"
-import { Parser } from "../parser"
-import { Token } from "../tokenizer"
+import { Parser } from '../parser';
+import { Token } from '../tokenizer';
+import { Expression } from './expression';
 
 export interface PostfixParser {
     precedence: number

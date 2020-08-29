@@ -1,5 +1,6 @@
-import { Blocks } from "./core"
-import readline from "readline"
+import readline from 'readline';
+
+import { Blocks } from './core';
 
 const core = new Blocks()
 
