@@ -1,13 +1,14 @@
-import { Blocks } from "../core"
 import { Parser } from "../parser"
-import { Token } from "../tokenizer"
+import { Token } from "../lexer"
 import { Expression } from "./expression"
-import { postfixParser, PostfixParser } from "./postfix-op"
+import { postfixParser } from "./postfix-op"
+import { BinaryFun } from "../utils/binary-fun"
+import { Scope } from "../engine/scope"
 
 export const binaryOpParser = (
     precedence: number,
-    fun: (...args: any[]) => any,
-): PostfixParser<BinaryOpExpr> =>
+    fun: BinaryFun,
+) =>
     postfixParser(
         precedence,
         (parser: Parser, token: Token, expr1: Expression) => {
@@ -21,11 +22,11 @@ export class BinaryOpExpr implements Expression {
         private operator: string,
         private expr1: Expression,
         private expr2: Expression,
-        private fun: (...args: any[]) => any,
+        private fun: BinaryFun,
     ) {}
 
-    eval(core: Blocks) {
-        return this.fun(this.expr1.eval(core), this.expr2.eval(core))
+    eval(scope: Scope) {
+        return this.fun(this.expr1.eval(scope), this.expr2.eval(scope))
     }
 
     print(): string {

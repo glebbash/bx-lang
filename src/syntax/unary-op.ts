@@ -1,10 +1,10 @@
-import { Blocks } from "../core"
 import { Parser } from "../parser"
-import { Token } from "../tokenizer"
+import { Token } from "../lexer"
 import { Expression } from "./expression"
 import { PrefixParser } from "./prefix-op"
+import { Scope } from "../engine/scope"
 
-export const unaryOpParser = (fun: (...args: any[]) => any): PrefixParser => (
+export const unaryOpParser = (fun: (x: any) => any): PrefixParser => (
     parser: Parser,
     token: Token,
 ) => {
@@ -19,8 +19,8 @@ export class UnaryOpExpr implements Expression {
         private fun: (...args: any[]) => any,
     ) {}
 
-    eval(core: Blocks) {
-        return this.fun(this.expr.eval(core))
+    eval(scope: Scope) {
+        return this.fun(this.expr.eval(scope))
     }
 
     print(): string {

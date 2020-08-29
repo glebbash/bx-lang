@@ -1,5 +1,5 @@
-import { panic } from '../utils/panic';
-import { BValue } from './engine';
+import { panic } from "../utils/panic"
+import { BValue } from "./engine"
 
 export type Cell = {
     value: BValue
@@ -9,12 +9,21 @@ export type Cell = {
 export class Scope {
     private data = new Map<string, Cell>()
 
-    has(name: string) {
+    constructor(private parent?: Scope) {}
+
+    has(name: string): boolean {
         return this.data.has(name)
     }
 
     getCell(name: string): Cell {
-        return this.data.get(name) ?? panic(`Error: ${name} is not defined.`)
+        const val = this.data.get(name)
+        if (val === undefined) {
+            if (!this.parent) {
+                panic(`Error: ${name} is not defined.`)
+            }
+            return this.parent.getCell(name)
+        }
+        return val
     }
 
     get(name: string): BValue {

@@ -1,6 +1,5 @@
-import { Blocks } from "../core"
 import { Parser } from "../parser"
-import { Token } from "../tokenizer"
+import { Token } from "../lexer"
 import { Expression } from "./expression"
 import { PrefixParser } from "./prefix-op"
 
@@ -17,7 +16,7 @@ export const CONST_PARSER: PrefixParser<ConstExpr> = (
 export class ConstExpr implements Expression {
     constructor(private value: any) {}
 
-    eval(_core: Blocks) {
+    eval() {
         return this.value
     }
 

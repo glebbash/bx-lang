@@ -1,8 +1,8 @@
 import { readFileSync } from 'fs';
 
-import { Tokenizer } from '../../src/new/tokenizer';
+import { Lexer } from './lexer';
 
 console.log("start")
-const data = readFileSync("data/test1.new", { encoding: "utf-8" })
-const tokens = new Tokenizer().tokenize(data)
+const data = readFileSync("data/test1.bx", { encoding: "utf-8" })
+const tokens = new Lexer().tokenize(data)
 console.dir(tokens, { depth: 10 })

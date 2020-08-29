@@ -1,7 +1,8 @@
 import { Blocks } from '../core';
+import { Scope } from '../engine/scope';
 
 export interface Expression {
-    eval(core: Blocks): any
+    eval(scope: Scope): any
 
     print(): string
 }

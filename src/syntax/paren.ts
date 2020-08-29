@@ -1,5 +1,5 @@
 import { Parser } from "../parser"
-import { Expr, Token } from "../tokenizer"
+import { Expr, Token } from "../lexer"
 import { syntaxError } from "../utils/syntax-error"
 import { ConstExpr } from "./const"
 import { PrefixParser } from "./prefix-op"
@@ -13,5 +13,5 @@ export const PAREN_PARSER: PrefixParser = (parser: Parser, token: Token) => {
     if (exprs[0].length === 0) {
         return new ConstExpr(null)
     }
-    return parser.parseSub(exprs[0])
+    return parser.parseSubExpr(exprs[0])
 }

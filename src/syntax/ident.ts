@@ -1,8 +1,8 @@
-import { Blocks } from "../core"
 import { Parser } from "../parser"
-import { Token } from "../tokenizer"
+import { Token } from "../lexer"
 import { Expression } from "./expression"
 import { PrefixParser } from "./prefix-op"
+import { Scope } from "../engine/scope"
 
 export const IDENT_PARSER: PrefixParser<IdentExpr> = (
     _parser: Parser,
@@ -12,8 +12,8 @@ export const IDENT_PARSER: PrefixParser<IdentExpr> = (
 export class IdentExpr implements Expression {
     constructor(public name: string) {}
 
-    eval(core: Blocks) {
-        return core.engine.scope.get(this.name)
+    eval(scope: Scope) {
+        return scope.get(this.name)
     }
 
     print() {

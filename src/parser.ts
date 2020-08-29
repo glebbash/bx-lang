@@ -1,9 +1,9 @@
-import { Expression } from './syntax/expression';
-import { PostfixParser } from './syntax/postfix-op';
-import { PrefixParser } from './syntax/prefix-op';
-import { Expr, Token } from './tokenizer';
-import { stream } from './utils/stream';
-import { syntaxError } from './utils/syntax-error';
+import { Expression } from "./syntax/expression"
+import { PostfixParser } from "./syntax/postfix-op"
+import { PrefixParser } from "./syntax/prefix-op"
+import { Expr, Token } from "./lexer"
+import { stream } from "./utils/stream"
+import { syntaxError } from "./utils/syntax-error"
 
 type TokenStream = (consume?: boolean) => Token | null
 
@@ -20,8 +20,12 @@ export class Parser {
         private nextToken: TokenStream = null as any,
     ) {}
 
-    parseSub(expr: Expr): Expression {
-        return new Parser(this.prefix, this.postfix, stream(expr)).parse()
+    subParser(expr: Expr): Parser {
+        return new Parser(this.prefix, this.postfix, stream(expr))
+    }
+
+    parseSubExpr(expr: Expr): Expression {
+        return this.subParser(expr).parse()
     }
 
     parseAll(exprs: Expr[]): Expression[] {
@@ -40,9 +44,12 @@ export class Parser {
             expr = this.getPostfixParser(token)(this, token, expr)
         }
 
-        const invalid = this.nextToken(false)
-        if (invalid !== null) {
-            syntaxError("Invalid operator " + invalid.value, invalid.start)
+        const next = this.nextToken(false)
+        if (next !== null && !this.getPostfixParser(next, false)) {
+            syntaxError(
+                "Invalid operator " + this.getTokenType(next),
+                next.start,
+            )
         }
 
         return expr
@@ -86,11 +93,21 @@ export class Parser {
         }
     }
 
+    eatValue(value: string) {
+        const token = this.nextToken(false)
+        if (token === null || token.value !== value) {
+            return false
+        }
+        this.next()
+        return true
+    }
+
     next(consume = true): Token {
         const token = this.nextToken(consume)
         if (token === null) {
             syntaxError("Expected more tokens", this.prevToken.end)
         }
+        this.prevToken = token
         return token
     }
 

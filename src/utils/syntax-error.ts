@@ -1,9 +1,9 @@
-import { Token } from '../tokenizer';
+import { Token } from '../lexer';
 import { panic } from './panic';
 
 export class SyntaxError extends Error {
     constructor(message: string, private position: Token["start"]) {
-        super(message)
+        super(message + " at " + position)
     }
 
     toString() {

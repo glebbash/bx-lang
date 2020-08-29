@@ -1,4 +1,4 @@
-import { Blocks } from "../core"
+import { Scope } from "../engine/scope"
 import { Parser } from "../parser"
 import { Expression } from "./expression"
 import { IDENT_PARSER } from "./ident"
@@ -13,8 +13,8 @@ export const LET_PARSER: PrefixParser<LetExpr> = (parser: Parser) => {
 export class LetExpr implements Expression {
     constructor(private name: string, private expr: Expression) {}
 
-    eval(core: Blocks) {
-        core.engine.scope.define(this.name, this.expr.eval(core))
+    eval(scope: Scope) {
+        scope.define(this.name, this.expr.eval(scope))
         return null
     }
 
