@@ -8,6 +8,7 @@
     "strict": true,
     "rootDirs": ["src", "tests"],
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "downlevelIteration": true,
   }
 }

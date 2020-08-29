@@ -24,7 +24,7 @@ export type Token = {
     value: string | Expr[]
 }
 
-export type TokenizerConfig = {
+export type LexerConfig = {
     singleLineCommentStart: string | null
     multiLineCommentStart: string | null
     multiLineCommentEnd: string | null
@@ -38,7 +38,7 @@ export type TokenizerConfig = {
     captureComments: boolean
 }
 
-const DEFAULT_CONFIG: TokenizerConfig = {
+const DEFAULT_CONFIG: LexerConfig = {
     singleLineCommentStart: ";",
     multiLineCommentStart: null,
     multiLineCommentEnd: null,
@@ -56,8 +56,8 @@ const DEFAULT_CONFIG: TokenizerConfig = {
     captureComments: false,
 }
 
-export class Tokenizer {
-    private config: TokenizerConfig
+export class Lexer {
+    private config: LexerConfig
     private source = ""
     private prevRow = 1
     private prevCol = 0
@@ -66,7 +66,7 @@ export class Tokenizer {
     private offset = -1
     private char: string | EOF = EOF
 
-    constructor(config?: Partial<TokenizerConfig>) {
+    constructor(config?: Partial<LexerConfig>) {
         this.config = Object.assign({}, DEFAULT_CONFIG, config ?? {})
     }
 
@@ -98,7 +98,7 @@ export class Tokenizer {
     private exprIndented(
         row: number,
         col: number,
-        end: Tokenizer["char"],
+        end: Lexer["char"],
     ): Token[] {
         const expr: Token[] = []
         while (true) {
@@ -114,6 +114,10 @@ export class Tokenizer {
                     ;(last.value as Expr[]).push(
                         this.exprIndented(this.row, this.col, end),
                     )
+                    continue
+                }
+                if (last.end[0] === this.row) {
+                    expr.push(this.atom() ?? this.panicUnexpected())
                     continue
                 }
                 expr.push(
@@ -162,7 +166,7 @@ export class Tokenizer {
     private exprBracketed([
         end,
         type,
-    ]: TokenizerConfig["bracketed"][string]): Token {
+    ]: LexerConfig["bracketed"][string]): Token {
         return this.token(type, () => {
             const exprs: Expr[] = []
             this.next() // skip opening bracket
