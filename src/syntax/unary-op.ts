@@ -1,15 +1,16 @@
-import { Blocks } from '../core';
-import { Parser } from '../parser';
-import { Token } from '../tokenizer';
-import { Expression } from './expression';
-import { PrefixParser } from './prefix-op';
+import { Blocks } from "../core"
+import { Parser } from "../parser"
+import { Token } from "../tokenizer"
+import { Expression } from "./expression"
+import { PrefixParser } from "./prefix-op"
 
-export const unaryOpParser = (fun: (...args: any[]) => any): PrefixParser => ({
-    parse(parser: Parser, token: Token): Expression {
-        const expr = parser.parse()
-        return new UnaryOpExpr(token.value as string, expr, fun)
-    },
-})
+export const unaryOpParser = (fun: (...args: any[]) => any): PrefixParser => (
+    parser: Parser,
+    token: Token,
+) => {
+    const expr = parser.parse()
+    return new UnaryOpExpr(token.value as string, expr, fun)
+}
 
 export class UnaryOpExpr implements Expression {
     constructor(

@@ -1,19 +1,20 @@
-import { Blocks } from '../core';
-import { Parser } from '../parser';
-import { Token } from '../tokenizer';
-import { Expression } from './expression';
-import { PostfixParser } from './postfix-op';
+import { Blocks } from "../core"
+import { Parser } from "../parser"
+import { Token } from "../tokenizer"
+import { Expression } from "./expression"
+import { postfixParser, PostfixParser } from "./postfix-op"
 
 export const binaryOpParser = (
     precedence: number,
     fun: (...args: any[]) => any,
-): PostfixParser => ({
-    precedence,
-    parse(parser: Parser, token: Token, expr1: Expression): Expression {
-        const expr2 = parser.parse(precedence)
-        return new BinaryOpExpr(token.value as string, expr1, expr2, fun)
-    },
-})
+): PostfixParser<BinaryOpExpr> =>
+    postfixParser(
+        precedence,
+        (parser: Parser, token: Token, expr1: Expression) => {
+            const expr2 = parser.parse(precedence)
+            return new BinaryOpExpr(token.value as string, expr1, expr2, fun)
+        },
+    )
 
 export class BinaryOpExpr implements Expression {
     constructor(

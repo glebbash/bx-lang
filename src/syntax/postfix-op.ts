@@ -1,9 +1,17 @@
-import { Parser } from '../parser';
-import { Token } from '../tokenizer';
-import { Expression } from './expression';
+import { Parser } from "../parser"
+import { Token } from "../tokenizer"
+import { Expression } from "./expression"
 
-export interface PostfixParser {
+export interface PostfixParser<T extends Expression = Expression> {
     precedence: number
 
-    parse(parser: Parser, token: Token, expr: Expression): Expression
+    (parser: Parser, token: Token, expr: Expression): T
+}
+
+export function postfixParser<T extends Expression>(
+    precedence: number,
+    fun: (parser: Parser, token: Token, expr: Expression) => T,
+): PostfixParser<T> {
+    ;(fun as any).precedence = precedence
+    return fun as any
 }

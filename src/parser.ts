@@ -33,11 +33,11 @@ export class Parser {
 
     parse(precedence = 0): Expression {
         const token = this.next()
-        let expr = this.getPrefixParser(token).parse(this, token)
+        let expr = this.getPrefixParser(token)(this, token)
 
         while (precedence < this.tokenPrecedence()) {
             const token = this.next()
-            expr = this.getPostfixParser(token).parse(this, token, expr)
+            expr = this.getPostfixParser(token)(this, token, expr)
         }
 
         const invalid = this.nextToken(false)
