@@ -12,7 +12,11 @@ readline
         terminal: false,
     })
     .on("line", function (line) {
-        const res = core.eval(line)
-        console.log("=", res)
+        try {
+            const res = core.eval(line)
+            console.log("=", res)
+        } catch (e) {
+            console.log("!", e.toString())
+        }
         process.stdout.write("> ")
     })

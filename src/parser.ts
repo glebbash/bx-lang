@@ -1,14 +1,19 @@
-import { m } from "multiline-str"
-import { Expression } from "./expressions/expression"
-import { PostfixParser } from "./parsers/postfix-parser"
-import { PrefixParser } from "./parsers/prefix-parser"
+import { Expression } from "./syntax/expression"
+import { PostfixParser } from "./syntax/postfix-op"
+import { PrefixParser } from "./syntax/prefix-op"
 import { Expr, Token } from "./tokenizer"
-import { panic } from "./utils/panic"
 import { stream } from "./utils/stream"
+import { syntaxError } from "./utils/syntax-error"
 
 type TokenStream = (consume?: boolean) => Token | null
 
+const START_TOKEN: Token = <any>{
+    end: [1, 1],
+}
+
 export class Parser {
+    private prevToken = START_TOKEN
+
     constructor(
         public prefix: Map<string, PrefixParser>,
         public postfix: Map<string, PostfixParser>,
@@ -35,6 +40,11 @@ export class Parser {
             expr = this.getPostfixParser(token).parse(this, token, expr)
         }
 
+        const invalid = this.nextToken(false)
+        if (invalid !== null) {
+            syntaxError("Invalid operator " + invalid.value, invalid.start)
+        }
+
         return expr
     }
 
@@ -51,7 +61,7 @@ export class Parser {
     getPrefixParser(token: Token, strict = true): PrefixParser | undefined {
         const parser = this.prefix.get(this.getTokenType(token))
         if (parser === undefined && strict) {
-            return panic("Invalid prefix operator: " + token.value)
+            syntaxError("Invalid prefix operator: " + token.value, token.start)
         }
         return parser
     }
@@ -61,7 +71,7 @@ export class Parser {
     getPostfixParser(token: Token, strict = true): PostfixParser | undefined {
         const parser = this.postfix.get(this.getTokenType(token))
         if (parser === undefined && strict) {
-            return panic("Invalid operator: " + token.value)
+            syntaxError("Invalid operator: " + token.value, token.start)
         }
         return parser
     }
@@ -69,15 +79,19 @@ export class Parser {
     nextValue(value: string) {
         const token = this.next()
         if (token.value !== value) {
-            panic(m`
-                SyntaxError: Unexpected token ${token.type}, expecting ${value}.
-                    at ${token.start}
-                `)
+            syntaxError(
+                `Unexpected token ${token.value}, expecting ${value}`,
+                token.start,
+            )
         }
     }
 
     next(consume = true): Token {
-        return this.nextToken(consume) ?? panic("Expected more tokens")
+        const token = this.nextToken(consume)
+        if (token === null) {
+            syntaxError("Expected more tokens", this.prevToken.end)
+        }
+        return token
     }
 
     getTokenType(token: Token): string {
@@ -102,7 +116,7 @@ export class Parser {
                 }
                 return "<IDENT>"
             default:
-                panic("Unsupported token: " + token.type)
+                syntaxError(`Unsupported token: ${token.type}`, token.start)
         }
     }
 }

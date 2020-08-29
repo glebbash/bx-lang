@@ -1,8 +1,8 @@
-import { ConstExpr } from "../expressions/const-expr"
-import { Expression } from "../expressions/expression"
+import { Blocks } from "../core"
+import { Expression } from "./expression"
 import { Parser } from "../parser"
 import { Token } from "../tokenizer"
-import { PrefixParser } from "./prefix-parser"
+import { PrefixParser } from "./prefix-op"
 
 export const CONST_PARSER: PrefixParser = {
     parse(_parser: Parser, token: Token): Expression {
@@ -12,4 +12,16 @@ export const CONST_PARSER: PrefixParser = {
             : Number(token.value),
         )
     },
+}
+
+export class ConstExpr implements Expression {
+    constructor(private value: any) {}
+
+    eval(_core: Blocks) {
+        return this.value
+    }
+
+    print(): string {
+        return "" + this.value
+    }
 }

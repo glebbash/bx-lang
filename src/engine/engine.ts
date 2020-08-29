@@ -1,4 +1,5 @@
 import { AutoMap } from "../utils/auto-map"
+import { panic } from "../utils/panic"
 import { Scope } from "./scope"
 
 export type BMethod = (self: BValue, ...args: BValue[]) => BValue
@@ -32,7 +33,7 @@ export class BType {
     expectMethod(name: string): BMethod {
         const method = this.getMethod(name)
         if (method == null) {
-            throw new Error(`Type ${this.name} has no '${name}' method.`)
+            panic(`Type ${this.name} has no '${name}' method.`)
         }
         return method
     }
@@ -47,16 +48,12 @@ export class BValue {
 
     as<T>(type: BClass<BType, (...args: any) => T>): T {
         if (this.type !== type.name) {
-            throw new Error(`Cannot cast ${this.type} to ${type.name}`)
+            panic(`Cannot cast ${this.type} to ${type.name}`)
         }
         return this as any
     }
 
-    invoke(
-        engine: Engine,
-        methodName: string,
-        ...args: BValue[]
-    ): BValue {
+    invoke(engine: Engine, methodName: string, ...args: BValue[]): BValue {
         const method = engine.expectType(this.type).expectMethod(methodName)
         return method(this, ...args)
     }
@@ -89,7 +86,7 @@ export class Engine {
     expectType(name: string): BType {
         const type = this.getType(name)
         if (type === null) {
-            throw new Error(`There is no ${name} type in this context.`)
+            panic(`There is no ${name} type in this context.`)
         }
         return type
     }
@@ -120,9 +117,7 @@ export function Class<T extends BType, F extends Function>(
 }
 
 export function caller(engine: Engine) {
-    return <T extends BValue>(
-        obj: T,
-    ): T & { [key: string]: BMethodBound } => {
+    return <T extends BValue>(obj: T): T & { [key: string]: BMethodBound } => {
         return new Proxy(obj, {
             get: (target, prop: string) => {
                 if (prop in target) return (target as any)[prop]

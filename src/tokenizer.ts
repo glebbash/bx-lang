@@ -1,3 +1,5 @@
+import { syntaxError } from "./utils/syntax-error"
+
 const EOF = null
 type EOF = typeof EOF
 
@@ -77,7 +79,7 @@ export class Tokenizer {
         this.col = 0
         this.offset = -1
         this.char = EOF
-    
+
         this.next() // read first
 
         const exprs: Expr[] = []
@@ -109,7 +111,7 @@ export class Tokenizer {
             } else if (this.col > col) {
                 const last = expr[expr.length - 1]
                 if (last.type === "block_indent") {
-                    (last.value as Expr[]).push(
+                    ;(last.value as Expr[]).push(
                         this.exprIndented(this.row, this.col, end),
                     )
                     continue
@@ -200,13 +202,13 @@ export class Tokenizer {
                 this.nextExceptEof()
                 // @ts-ignore
                 if (this.char === "\n") {
-                    throw new Error("String not closed " + this.pos())
+                    syntaxError("String not closed", this.pos())
                 } else {
-                    buff += escapeChar(this.char)
+                    buff += this.escapeChar(this.char)
                     continue
                 }
             } else if (this.char === "\n") {
-                throw new Error("String not closed " + this.pos())
+                syntaxError("String not closed", this.pos())
             } else if (this.char === ending) {
                 this.next()
                 buff += ending
@@ -334,31 +336,27 @@ export class Tokenizer {
 
     private panicUnexpected(): never {
         return this.char === EOF
-            ? panic(`Unexpected EOF ${this.pos()}`)
-            : panic(`Unexpected char '${this.char}' ${this.pos()}`)
+            ? syntaxError("Unexpected EOF", this.pos())
+            : syntaxError(`Unexpected char '${this.char}'`, this.pos())
     }
 
-    private pos() {
-        return `at line ${this.row}, pos ${this.col}`
+    private escapeChar(char: string): string {
+        switch (char) {
+            case '"':
+            case "'":
+                return char
+            case "n":
+                return "\n"
+            case "t":
+                return "\t"
+            case "v":
+                return "\v"
+            default:
+                syntaxError("Invalid escape sequence", this.pos())
+        }
     }
-}
 
-function escapeChar(char: string): string {
-    switch (char) {
-        case '"':
-        case "'":
-            return char
-        case "n":
-            return "\n"
-        case "t":
-            return "\t"
-        case "v":
-            return "\v"
-        default:
-            throw new Error("Invalid escape sequence")
+    private pos(): [row: number, col: number] {
+        return [this.row, this.col]
     }
-}
-
-function panic(err: any): never {
-    throw err
 }

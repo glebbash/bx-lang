@@ -1,15 +1,15 @@
 import { Engine } from "./engine/engine"
-import { binaryOpParser } from "./parsers/binary-op-parser"
-import { CONST_PARSER } from "./parsers/const-parser"
-import { IDENT_PARSER } from "./parsers/ident-parser"
-import { PANIC_PARSER } from "./parsers/panic-parser"
-import { PostfixParser } from "./parsers/postfix-parser"
-import { PrefixParser } from "./parsers/prefix-parser"
-import { unaryOpParser } from "./parsers/unary-op-parser"
+import { binaryOpParser } from "./syntax/binary-op"
+import { CONST_PARSER } from "./syntax/const"
+import { IDENT_PARSER } from "./syntax/ident"
+import { PANIC_PARSER } from "./syntax/panic"
+import { PostfixParser } from "./syntax/postfix-op"
+import { PrefixParser } from "./syntax/prefix-op"
+import { unaryOpParser } from "./syntax/unary-op"
 import { Parser } from "./parser"
 import { Tokenizer } from "./tokenizer"
-import { PAREN_PARSER } from "./parsers/paren-parser"
-import { LET_PARSER } from "./parsers/let-parser"
+import { PAREN_PARSER } from "./syntax/paren"
+import { LET_PARSER } from "./syntax/let"
 
 export class Blocks {
     private tokenizer = new Tokenizer()
@@ -20,6 +20,12 @@ export class Blocks {
         const tokens = this.tokenizer.tokenize(source)
         const exprs = this.parser.parseAll(tokens)
         return exprs.map((expr) => expr.eval(this)).slice(-1)[0]
+    }
+
+    prettyPrint(source: string): string {
+        const tokens = this.tokenizer.tokenize(source)
+        const exprs = this.parser.parseAll(tokens)
+        return exprs.map((expr) => expr.print()).join("\n")
     }
 }
 
