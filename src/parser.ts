@@ -11,15 +11,11 @@ const START_TOKEN: Token = <any>{
     end: [1, 1],
 }
 
-type TypeOrValue =
-    | {
-          type: Token["type"]
-          value?: undefined
-      }
-    | {
-          type?: undefined
-          value: string
-      }
+type TokenCondition = {
+    type?: Token["type"]
+    value?: string
+    complexType?: string
+}
 
 export class Parser {
     private prevToken = START_TOKEN
@@ -93,29 +89,29 @@ export class Parser {
         return parser
     }
 
-    expect<T extends TypeOrValue>(cond: T): T & Token {
+    expect<T extends TokenCondition>(cond: T): Token {
         if (!this.nextIs(cond)) {
             const next = this.nextToken(false)
             const unexpected = next === null ? "EOF" : this.getTokenType(next)
             syntaxError(
-                `Unexpected ${unexpected}, expecting ${
-                    cond.type ?? cond.value
-                }`,
+                `Unexpected token '${unexpected}'`,
                 (next ?? this.prevToken).start,
             )
         }
         return this.next() as any
     }
 
-    nextIs(cond: TypeOrValue): boolean {
+    nextIs(cond: TokenCondition): boolean {
         const token = this.nextToken(false)
         if (token === null) {
             return false
         }
         if (cond.type !== undefined) {
             return token.type === cond.type
-        } else {
+        } else if (cond.value !== undefined) {
             return token.value === cond.value
+        } else {
+            return this.getTokenType(token) === cond.complexType!
         }
     }
 
@@ -150,7 +146,7 @@ export class Parser {
                 }
                 return "<IDENT>"
             default:
-                syntaxError(`Unsupported token: ${token.type}`, token.start)
+                syntaxError(`Unexpected token: ${token.type}`, token.start)
         }
     }
 }

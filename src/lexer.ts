@@ -1,4 +1,4 @@
-import { syntaxError } from './utils/syntax-error';
+import { syntaxError } from "./utils/syntax-error"
 
 const EOF = null
 type EOF = typeof EOF
@@ -339,9 +339,12 @@ export class Lexer {
     }
 
     private panicUnexpected(): never {
-        return this.char === EOF
-            ? syntaxError("Unexpected EOF", this.pos())
-            : syntaxError(`Unexpected char '${this.char}'`, this.pos())
+        return syntaxError(
+            this.char === EOF
+                ? "Unexpected EOF"
+                : `Unexpected char '${this.char}'`,
+            this.pos(),
+        )
     }
 
     private escapeChar(char: string): string {
