@@ -6,7 +6,7 @@ import { PrefixParser } from "./prefix-op"
 
 export const LET_PARSER: PrefixParser<LetExpr> = (parser: Parser) => {
     const identExpr = IDENT_PARSER(parser, parser.next())
-    parser.nextValue("=")
+    parser.expect({ value: "=" })
     return new LetExpr(identExpr.name, parser.parse())
 }
 

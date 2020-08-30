@@ -7,15 +7,16 @@ import { IdentExpr } from "./ident"
 import { postfixParser } from "./postfix-op"
 import { Scope } from "../engine/scope"
 
-export const ASSIGN_PARSER = postfixParser(
-    0.8,
-    (parser: Parser, token: Token, ident: Expression) => {
-        if (!(ident instanceof IdentExpr)) {
-            syntaxError("Unexpected token " + token.value, token.start)
-        }
-        return new AssignExpr(ident.name, parser.parse(0.8))
-    },
-)
+export const assignParser = (precedence: number) =>
+    postfixParser(
+        precedence,
+        (parser: Parser, token: Token, ident: Expression) => {
+            if (!(ident instanceof IdentExpr)) {
+                syntaxError("Unexpected token " + token.value, token.start)
+            }
+            return new AssignExpr(ident.name, parser.parse(precedence))
+        },
+    )
 
 export class AssignExpr implements Expression {
     constructor(private name: string, private value: Expression) {}

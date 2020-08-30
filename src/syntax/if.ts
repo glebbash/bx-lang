@@ -8,7 +8,8 @@ import { PrefixParser } from "./prefix-op"
 export const IF_PARSER: PrefixParser<IfExpr> = (parser: Parser) => {
     const cond = PAREN_PARSER(parser, parser.next())
     const ifTrue = BLOCK_PARSER(parser, parser.next())
-    if (parser.eatValue("else")) {
+    if (parser.nextIs({ value: "else" })) {
+        parser.next()
         const ifFalse = BLOCK_PARSER(parser, parser.next())
         return new IfExpr(cond, ifTrue, ifFalse)
     }

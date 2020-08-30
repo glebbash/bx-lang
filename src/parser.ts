@@ -11,6 +11,16 @@ const START_TOKEN: Token = <any>{
     end: [1, 1],
 }
 
+type TypeOrValue =
+    | {
+          type: Token["type"]
+          value?: undefined
+      }
+    | {
+          type?: undefined
+          value: string
+      }
+
 export class Parser {
     private prevToken = START_TOKEN
 
@@ -83,23 +93,30 @@ export class Parser {
         return parser
     }
 
-    nextValue(value: string) {
-        const token = this.next()
-        if (token.value !== value) {
+    expect<T extends TypeOrValue>(cond: T): T & Token {
+        if (!this.nextIs(cond)) {
+            const next = this.nextToken(false)
+            const unexpected = next === null ? "EOF" : this.getTokenType(next)
             syntaxError(
-                `Unexpected token ${token.value}, expecting ${value}`,
-                token.start,
+                `Unexpected ${unexpected}, expecting ${
+                    cond.type ?? cond.value
+                }`,
+                (next ?? this.prevToken).start,
             )
         }
+        return this.next() as any
     }
 
-    eatValue(value: string) {
+    nextIs(cond: TypeOrValue): boolean {
         const token = this.nextToken(false)
-        if (token === null || token.value !== value) {
+        if (token === null) {
             return false
         }
-        this.next()
-        return true
+        if (cond.type !== undefined) {
+            return token.type === cond.type
+        } else {
+            return token.value === cond.value
+        }
     }
 
     next(consume = true): Token {
