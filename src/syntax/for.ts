@@ -1,5 +1,3 @@
-import { Blocks } from "../core"
-import { BNumber } from "../engine/prelude"
 import { Scope } from "../engine/scope"
 import { Expr } from "../lexer"
 import { Parser } from "../parser"
@@ -7,17 +5,10 @@ import { syntaxError } from "../utils/syntax-error"
 import { BLOCK_PARSER } from "./block"
 import { Expression } from "./expression"
 import { IDENT_PARSER } from "./ident"
-import { PAREN_PARSER } from "./paren"
 import { PrefixParser } from "./prefix-op"
 
 export const FOR_PARSER: PrefixParser<ForExpr> = (parser: Parser) => {
-    const condExpr = parser.next()
-    if (condExpr.type !== "block_paren") {
-        syntaxError(
-            `Unexpected token ${parser.getTokenType(condExpr)}`,
-            condExpr.start,
-        )
-    }
+    const condExpr = parser.expect({ type: "block_paren" })
     const exprs = condExpr.value as Expr[]
     if (exprs.length !== 1) {
         syntaxError("Multiple expressions in parentheses.", condExpr.start)
@@ -27,7 +18,7 @@ export const FOR_PARSER: PrefixParser<ForExpr> = (parser: Parser) => {
     }
     const condParser = parser.subParser(exprs[0])
     const name = IDENT_PARSER(condParser, condParser.next()).name
-    condParser.nextValue("in")
+    condParser.expect({ value: "in" })
     const iterable = condParser.parse()
 
     const body = BLOCK_PARSER(parser, parser.next())
