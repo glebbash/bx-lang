@@ -9,7 +9,7 @@ import { FOR_PARSER } from "./syntax/for"
 import { FUN_PARSER } from "./syntax/fun"
 import { IDENT_PARSER } from "./syntax/ident"
 import { IF_PARSER } from "./syntax/if"
-import { LET_PARSER } from "./syntax/let"
+import { defineParser } from "./syntax/define"
 import { PANIC_PARSER } from "./syntax/panic"
 import { PAREN_PARSER } from "./syntax/paren"
 import { PostfixParser } from "./syntax/postfix-op"
@@ -75,7 +75,8 @@ export class BlocksParser extends Parser {
         this.unaryOp("!", (a) => !a)
 
         this.macro("print", PRINT_PARSER)
-        this.macro("let", LET_PARSER)
+        this.macro("let", defineParser(false))
+        this.macro("const", defineParser(true))
         this.macro("if", IF_PARSER)
         this.macro("while", WHILE_PARSER)
         this.macro("for", FOR_PARSER)
