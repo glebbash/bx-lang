@@ -5,11 +5,15 @@ import { BinaryFun } from "../utils/binary-fun"
 import { Expression } from "./expression"
 import { postfixParser } from "./postfix-op"
 
-export const binaryOp = (precedence: number, fun: BinaryFun) =>
+export const binaryOp = (
+    precedence: number,
+    fun: BinaryFun,
+    rightAssoc = false,
+) =>
     postfixParser(
         precedence,
         (parser: Parser, token: Token, expr1: Expression) => {
-            const expr2 = parser.parse(precedence)
+            const expr2 = parser.parse(precedence - (rightAssoc ? 1 : 0))
             return new BinaryOpExpr(token.value as string, expr1, expr2, fun)
         },
     )

@@ -55,7 +55,7 @@ export class BlocksParser extends Parser {
         this.binaryOp(prec("*").moreThan("+"), MUL)
         this.binaryOp(prec("/").sameAs("*"), DIV)
         this.binaryOp(prec("%").sameAs("*"), MOD)
-        this.binaryOp(prec("^").moreThan("*"), POW)
+        this.binaryOp(prec("^").moreThan("*"), POW, true)
         this.binaryOp(prec("==").lessThan("+"), (a, b) => bool(a.equals(b)))
         this.binaryOp(prec("!=").sameAs("=="), (a, b) => bool(!a.equals(b)))
         this.binaryOp(prec(">").sameAs("=="), (a, b) => bool(num(a) > num(b)))
@@ -98,11 +98,11 @@ export class BlocksParser extends Parser {
         this.postfix.set(name, doAndAssign(precedence, fun))
     }
 
-    binaryOp([name, precedence]: [string, number], fun: BinaryFun) {
+    binaryOp([name, precedence]: [string, number], fun: BinaryFun, rightAssoc = false) {
         if (this.postfix.has(name)) {
             panic(`Cannot redefine binary op '${name}'`)
         }
-        this.postfix.set(name, binaryOp(precedence, fun))
+        this.postfix.set(name, binaryOp(precedence, fun, rightAssoc))
     }
 
     unaryOp(value: string, fun: (x: any) => any) {
