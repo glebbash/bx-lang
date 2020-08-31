@@ -6,7 +6,6 @@
     "sourceMap": true,
     "noEmit": true,
     "strict": true,
-    "rootDirs": ["src", "tests"],
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "downlevelIteration": true,
