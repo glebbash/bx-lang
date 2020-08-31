@@ -1,5 +1,5 @@
 import { BValue } from "../engine/engine"
-import { BFunction, VOID } from "../engine/prelude"
+import { BFunction, BReturn, VOID } from "../engine/prelude"
 import { Scope } from "../engine/scope"
 import { Expr } from "../lexer"
 import { Parser } from "../parser"
@@ -37,7 +37,8 @@ export class FunExpr implements Expression {
                         funScope.define(this.params[i], args[i])
                     }
                 }
-                return this.body.eval(funScope)
+                const res = this.body.eval(funScope)
+                return res.is(BReturn) ? res.data : res
             }),
         )
         return VOID

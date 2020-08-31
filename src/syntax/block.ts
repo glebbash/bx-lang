@@ -19,7 +19,7 @@ export class BlockExpr implements Expression {
         for (const expr of this.body) {
             res = expr.eval(scope)
             if (res.is(BReturn)) {
-                return res.data
+                return res
             }
         }
         return res
