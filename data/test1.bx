@@ -1,7 +1,7 @@
 fun factorial(x) = if (x <= 2) {
-    x
+    return x
 } else {
-    x * factorial(x - 1)
+    return x * factorial(x - 1)
 }
 
 print factorial(10)

@@ -1,15 +1,16 @@
+import { BFunction } from "../engine/prelude"
 import { Scope } from "../engine/scope"
 import { Token } from "../lexer"
 import { Parser } from "../parser"
 import { Expression } from "./expression"
-import { PAREN_PARSER } from "./paren"
+import { PAREN } from "./paren"
 import { postfixParser } from "./postfix-op"
 
-export const callParser = (precedence: number) =>
+export const call = (precedence: number) =>
     postfixParser(
         precedence,
         (parser: Parser, token: Token, expr: Expression) => {
-            return new CallExpr(expr, PAREN_PARSER(parser, token))
+            return new CallExpr(expr, PAREN(parser, token))
         },
     )
 
@@ -18,7 +19,8 @@ export class CallExpr implements Expression {
 
     eval(scope: Scope) {
         const fun = this.fun.eval(scope)
-        return fun(this.args.eval(scope))
+        const value = fun.as(BFunction).call(this.args.eval(scope))
+        return value
     }
 
     print(): string {

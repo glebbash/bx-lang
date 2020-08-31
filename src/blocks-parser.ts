@@ -1,44 +1,51 @@
+import { BValue } from "./engine/engine"
+import { BNumber, bool, BRange } from "./engine/prelude"
 import { Parser } from "./parser"
-import { assignParser } from "./syntax/assign"
-import { binaryOpParser } from "./syntax/binary-op"
-import { BLOCK_PARSER } from "./syntax/block"
-import { callParser } from "./syntax/call"
-import { CONST_PARSER } from "./syntax/const"
+import { assign } from "./syntax/assign"
+import { binaryOp } from "./syntax/binary-op"
+import { BLOCK } from "./syntax/block"
+import { call } from "./syntax/call"
+import { define } from "./syntax/define"
 import { doAndAssign } from "./syntax/do-and-assign"
-import { FOR_PARSER } from "./syntax/for"
-import { FUN_PARSER } from "./syntax/fun"
-import { IDENT_PARSER } from "./syntax/ident"
-import { IF_PARSER } from "./syntax/if"
-import { defineParser } from "./syntax/define"
-import { PANIC_PARSER } from "./syntax/panic"
-import { PAREN_PARSER } from "./syntax/paren"
+import { FOR } from "./syntax/for"
+import { FUN } from "./syntax/fun"
+import { IDENT } from "./syntax/ident"
+import { IF } from "./syntax/if"
+import { LITERAL } from "./syntax/literal"
+import { PAREN } from "./syntax/paren"
 import { PostfixParser } from "./syntax/postfix-op"
 import { PrefixParser } from "./syntax/prefix-op"
-import { PRINT_PARSER } from "./syntax/print"
-import { unaryOpParser } from "./syntax/unary-op"
-import { WHILE_PARSER } from "./syntax/while"
+import { PRINT } from "./syntax/print"
+import { RETURN } from "./syntax/return"
+import { TODO } from "./syntax/todo"
+import { unaryOp } from "./syntax/unary-op"
+import { WHILE } from "./syntax/while"
 import { BinaryFun } from "./utils/binary-fun"
 import { panic } from "./utils/panic"
 import { precedence } from "./utils/relative-prec"
 
-const ADD: BinaryFun = (a, b) => a + b
-const SUB: BinaryFun = (a, b) => a - b
-const MUL: BinaryFun = (a, b) => a * b
-const DIV: BinaryFun = (a, b) => a / b
-const MOD: BinaryFun = (a, b) => a % b
-const POW: BinaryFun = (a, b) => a ** b
+function num(val: BValue): number {
+    return val.as(BNumber).data
+}
+
+const ADD: BinaryFun = (a, b) => new BNumber(num(a) + num(b))
+const SUB: BinaryFun = (a, b) => new BNumber(num(a) - num(b))
+const MUL: BinaryFun = (a, b) => new BNumber(num(a) * num(b))
+const DIV: BinaryFun = (a, b) => new BNumber(num(a) / num(b))
+const MOD: BinaryFun = (a, b) => new BNumber(num(a) % num(b))
+const POW: BinaryFun = (a, b) => new BNumber(num(a) ** num(b))
 
 export class BlocksParser extends Parser {
     constructor() {
         super(
             new Map<string, PrefixParser>()
-                .set("<IDENT>", IDENT_PARSER)
-                .set("<NUMBER>", CONST_PARSER)
-                .set("<STRING>", CONST_PARSER)
-                .set("<BLOCK_PAREN>", PAREN_PARSER)
-                .set("<BLOCK_BRACE>", BLOCK_PARSER)
-                .set("<BLOCK_INDENT>", BLOCK_PARSER)
-                .set("<BLOCK_BRACKET>", PANIC_PARSER),
+                .set("<IDENT>", IDENT)
+                .set("<NUMBER>", LITERAL)
+                .set("<STRING>", LITERAL)
+                .set("<BLOCK_PAREN>", PAREN)
+                .set("<BLOCK_BRACE>", BLOCK)
+                .set("<BLOCK_INDENT>", BLOCK)
+                .set("<BLOCK_BRACKET>", TODO),
             new Map<string, PostfixParser>(),
         )
         const prec = precedence()
@@ -49,20 +56,20 @@ export class BlocksParser extends Parser {
         this.binaryOp(prec("/").sameAs("*"), DIV)
         this.binaryOp(prec("%").sameAs("*"), MOD)
         this.binaryOp(prec("^").moreThan("*"), POW)
-        this.binaryOp(prec("==").lessThan("+"), (a, b) => a === b)
-        this.binaryOp(prec("!=").sameAs("=="), (a, b) => a !== b)
-        this.binaryOp(prec(">").sameAs("=="), (a, b) => a > b)
-        this.binaryOp(prec(">=").sameAs("=="), (a, b) => a >= b)
-        this.binaryOp(prec("<").sameAs("=="), (a, b) => a < b)
-        this.binaryOp(prec("<=").sameAs("=="), (a, b) => a <= b)
-        this.binaryOp(prec("..").lessThan("+"), (a, b) => rangeIterable(a, b))
-
-        this.postfix.set(
-            "<BLOCK_PAREN>",
-            callParser(prec("<CALL>").moreThan("^")[1]),
+        this.binaryOp(prec("==").lessThan("+"), (a, b) => bool(a.equals(b)))
+        this.binaryOp(prec("!=").sameAs("=="), (a, b) => bool(!a.equals(b)))
+        this.binaryOp(prec(">").sameAs("=="), (a, b) => bool(num(a) > num(b)))
+        this.binaryOp(prec(">=").sameAs("=="), (a, b) => bool(num(a) >= num(b)))
+        this.binaryOp(prec("<").sameAs("=="), (a, b) => bool(num(a) < num(b)))
+        this.binaryOp(prec("<=").sameAs("=="), (a, b) => bool(num(a) <= num(b)))
+        this.binaryOp(
+            prec("..").lessThan("+"),
+            (a, b) => new BRange(num(a), num(b)),
         )
 
-        this.postfix.set("=", assignParser(prec("=").lessThan("+")[1]))
+        this.postfix.set("<BLOCK_PAREN>", call(prec("<CALL>").moreThan("^")[1]))
+
+        this.postfix.set("=", assign(prec("=").lessThan("+")[1]))
         this.doAndAssign(prec("+=").sameAs("="), ADD)
         this.doAndAssign(prec("-=").sameAs("="), SUB)
         this.doAndAssign(prec("*=").sameAs("="), MUL)
@@ -74,13 +81,14 @@ export class BlocksParser extends Parser {
         this.unaryOp("+", (a) => +a)
         this.unaryOp("!", (a) => !a)
 
-        this.macro("print", PRINT_PARSER)
-        this.macro("let", defineParser(false))
-        this.macro("const", defineParser(true))
-        this.macro("if", IF_PARSER)
-        this.macro("while", WHILE_PARSER)
-        this.macro("for", FOR_PARSER)
-        this.macro("fun", FUN_PARSER)
+        this.macro("print", PRINT)
+        this.macro("let", define(false))
+        this.macro("const", define(true))
+        this.macro("if", IF)
+        this.macro("while", WHILE)
+        this.macro("for", FOR)
+        this.macro("return", RETURN)
+        this.macro("fun", FUN)
     }
 
     doAndAssign([name, precedence]: [string, number], fun: BinaryFun) {
@@ -94,14 +102,14 @@ export class BlocksParser extends Parser {
         if (this.postfix.has(name)) {
             panic(`Cannot redefine binary op '${name}'`)
         }
-        this.postfix.set(name, binaryOpParser(precedence, fun))
+        this.postfix.set(name, binaryOp(precedence, fun))
     }
 
     unaryOp(value: string, fun: (x: any) => any) {
         if (this.prefix.has(value)) {
             panic(`Cannot redefine unary op '${value}'`)
         }
-        this.prefix.set(value, unaryOpParser(fun))
+        this.prefix.set(value, unaryOp(fun))
     }
 
     macro(value: string, parser: PrefixParser) {

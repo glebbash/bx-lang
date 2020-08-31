@@ -1,13 +1,14 @@
+import { BREAK, BReturn, VOID } from "../engine/prelude"
 import { Scope } from "../engine/scope"
 import { Parser } from "../parser"
-import { BLOCK_PARSER } from "./block"
+import { BLOCK } from "./block"
 import { Expression } from "./expression"
-import { PAREN_PARSER } from "./paren"
+import { PAREN } from "./paren"
 import { PrefixParser } from "./prefix-op"
 
-export const WHILE_PARSER: PrefixParser<WhileExpr> = (parser: Parser) => {
-    const cond = PAREN_PARSER(parser, parser.expect({ type: "block_paren" }))
-    const body = BLOCK_PARSER(parser, parser.next())
+export const WHILE: PrefixParser<WhileExpr> = (parser: Parser) => {
+    const cond = PAREN(parser, parser.expect({ type: "block_paren" }))
+    const body = BLOCK(parser, parser.next())
     return new WhileExpr(cond, body)
 }
 
@@ -17,9 +18,14 @@ export class WhileExpr implements Expression {
     eval(scope: Scope) {
         const loopScope = new Scope(scope)
         while (this.cond.eval(scope)) {
-            this.body.eval(loopScope)
+            const res = this.body.eval(loopScope)
+            if (res === BREAK) {
+                break
+            } else if (res.is(BReturn)) {
+                return res
+            }
         }
-        return null
+        return VOID
     }
 
     print(): string {

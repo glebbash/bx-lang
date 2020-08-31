@@ -1,14 +1,11 @@
-import { Parser } from "../parser"
+import { Scope } from "../engine/scope"
 import { Token } from "../lexer"
+import { Parser } from "../parser"
+import { BinaryFun } from "../utils/binary-fun"
 import { Expression } from "./expression"
 import { postfixParser } from "./postfix-op"
-import { BinaryFun } from "../utils/binary-fun"
-import { Scope } from "../engine/scope"
 
-export const binaryOpParser = (
-    precedence: number,
-    fun: BinaryFun,
-) =>
+export const binaryOp = (precedence: number, fun: BinaryFun) =>
     postfixParser(
         precedence,
         (parser: Parser, token: Token, expr1: Expression) => {
@@ -26,7 +23,8 @@ export class BinaryOpExpr implements Expression {
     ) {}
 
     eval(scope: Scope) {
-        return this.fun(this.expr1.eval(scope), this.expr2.eval(scope))
+        const value = this.fun(this.expr1.eval(scope), this.expr2.eval(scope))
+        return value
     }
 
     print(): string {

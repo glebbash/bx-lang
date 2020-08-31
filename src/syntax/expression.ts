@@ -1,8 +1,8 @@
-import { Blocks } from '../core';
-import { Scope } from '../engine/scope';
+import { BValue } from "../engine/engine"
+import { Scope } from "../engine/scope"
 
 export interface Expression {
-    eval(scope: Scope): any
+    eval(scope: Scope): BValue
 
     print(): string
 }

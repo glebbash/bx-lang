@@ -1,9 +1,10 @@
-import { AutoMap } from '../utils/auto-map';
-import { panic } from '../utils/panic';
-import { Scope } from './scope';
+import { AutoMap } from "../utils/auto-map"
+import { panic } from "../utils/panic"
+import { Scope } from "./scope"
 
 export type BMethod = (self: BValue, ...args: BValue[]) => BValue
 export type BMethodBound = (...args: BValue[]) => BValue
+export type Constructor<T> = { new (...args: any): T }
 
 export class BType {
     private methods = new AutoMap(() => [] as BMethod[])
@@ -43,29 +44,44 @@ export class BType {
     }
 }
 
-export class BValue {
+export abstract class BValue {
     constructor(public type: string) {}
 
-    as<T>(type: BClass<BType, (...args: any) => T>): T {
-        if (this.type !== type.name) {
-            panic(`Cannot cast ${this.type} to ${type.name}`)
-        }
-        return this as any
+    as<T extends BValue>(type: Constructor<T>): T {
+        return this.is(type)
+            ? this
+            : panic(`Cannot cast ${this.type} to ${type.name}`)
+    }
+
+    is<T extends BValue>(type: Constructor<T>): this is T {
+        return this.constructor === type
     }
 
     invoke(engine: Engine, methodName: string, ...args: BValue[]): BValue {
         const method = engine.expectType(this.type).expectMethod(methodName)
         return method(this, ...args)
     }
-}
 
-export class BHolder<T> extends BValue {
-    constructor(type: string, public data: T) {
-        super(type)
+    equals(other: BValue) {
+        return this === other
     }
 
-    toString() {
-        return "" + this.data
+    abstract toString(): string
+}
+
+export function BWrapper<T>(type: string) {
+    return class extends BValue {
+        constructor(public data: T) {
+            super(type)
+        }
+
+        equals(other: BValue) {
+            return other.type === this.type && (other as any).data === this.data
+        }
+
+        toString() {
+            return "" + this.data
+        }
     }
 }
 

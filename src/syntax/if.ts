@@ -1,16 +1,17 @@
+import { TRUE, VOID } from "../engine/prelude"
 import { Scope } from "../engine/scope"
 import { Parser } from "../parser"
-import { BLOCK_PARSER } from "./block"
+import { BLOCK } from "./block"
 import { Expression } from "./expression"
-import { PAREN_PARSER } from "./paren"
+import { PAREN } from "./paren"
 import { PrefixParser } from "./prefix-op"
 
-export const IF_PARSER: PrefixParser<IfExpr> = (parser: Parser) => {
-    const cond = PAREN_PARSER(parser, parser.next())
-    const ifTrue = BLOCK_PARSER(parser, parser.next())
+export const IF: PrefixParser<IfExpr> = (parser: Parser) => {
+    const cond = PAREN(parser, parser.expect({ type: "block_paren" }))
+    const ifTrue = BLOCK(parser, parser.next())
     if (parser.nextIs({ value: "else" })) {
         parser.next()
-        const ifFalse = BLOCK_PARSER(parser, parser.next())
+        const ifFalse = BLOCK(parser, parser.next())
         return new IfExpr(cond, ifTrue, ifFalse)
     }
     return new IfExpr(cond, ifTrue)
@@ -24,12 +25,12 @@ export class IfExpr implements Expression {
     ) {}
 
     eval(scope: Scope) {
-        if (this.cond.eval(scope)) {
+        if (this.cond.eval(scope) === TRUE) {
             return this.ifTrue.eval(scope)
         } else if (this.ifFalse !== undefined) {
             return this.ifFalse.eval(scope)
         }
-        return null
+        return VOID
     }
 
     print(): string {

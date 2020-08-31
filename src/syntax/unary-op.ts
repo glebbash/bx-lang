@@ -1,10 +1,11 @@
-import { Parser } from "../parser"
+import { BValue } from "../engine/engine"
+import { Scope } from "../engine/scope"
 import { Token } from "../lexer"
+import { Parser } from "../parser"
 import { Expression } from "./expression"
 import { PrefixParser } from "./prefix-op"
-import { Scope } from "../engine/scope"
 
-export const unaryOpParser = (fun: (x: any) => any): PrefixParser => (
+export const unaryOp = (fun: (x: BValue) => BValue): PrefixParser => (
     parser: Parser,
     token: Token,
 ) => {
@@ -16,7 +17,7 @@ export class UnaryOpExpr implements Expression {
     constructor(
         private operator: string,
         private expr: Expression,
-        private fun: (...args: any[]) => any,
+        private fun: (x: BValue) => BValue,
     ) {}
 
     eval(scope: Scope) {
