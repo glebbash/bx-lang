@@ -73,16 +73,7 @@ export class Lexer {
     }
 
     tokenize(source: string): Expr[] {
-        this.source = source
-
-        this.prevRow = 1
-        this.prevCol = 0
-        this.row = 1
-        this.col = 0
-        this.offset = -1
-        this.char = EOF
-
-        this.next() // read first
+        this.reset(source)
 
         const exprs: Expr[] = []
         while (true) {
@@ -95,6 +86,31 @@ export class Lexer {
             exprs.push(this.exprIndented(this.row, this.col, EOF))
         }
         return exprs
+    }
+
+    *tokenizeIter(source: string): Generator<Expr> {
+        this.reset(source)
+
+        while (true) {
+            const comments: Token[] = []
+            this.skipWhiteSpace(comments)
+            if (comments.length > 0) yield comments
+
+            if (this.char === EOF) break
+
+            yield this.exprIndented(this.row, this.col, EOF)
+        }
+    }
+
+    private reset(source: string) {
+        this.source = source
+        this.prevRow = 1
+        this.prevCol = 0
+        this.row = 1
+        this.col = 0
+        this.offset = -1
+        this.char = EOF
+        this.next() // read first
     }
 
     private exprIndented(

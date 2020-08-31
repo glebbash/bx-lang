@@ -1,18 +1,24 @@
 import Benchmark from 'benchmark';
 import { readFileSync } from 'fs';
 
-import { Tokenizer as T1 } from '../../src/new/tokenizer';
+import { Lexer } from '../../src/lexer';
 
-const data = readFileSync("data/main.nips", { encoding: "utf-8" })
+const data = readFileSync("data/test1.bx", { encoding: "utf-8" })
 
 Benchmark.options.minSamples = 500
 
+const lexer = new Lexer()
+
 new Benchmark.Suite()
-    .add("config", () => {
-        new T1(data).tokenize()
+    .add("def", () => {
+        for (const x of lexer.tokenizeIter(data)) {
+            x.length
+        }
     })
-    .add("const", () => {
-        new T2(data).tokenize()
+    .add("array", () => {
+        for (const x of lexer.tokenize(data)) {
+            x.length
+        }
     })
     .on("cycle", (ev: Event) => {
         console.log(String(ev.target))
