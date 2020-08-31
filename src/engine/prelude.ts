@@ -21,11 +21,7 @@ export class BFunction extends BWrapper<BFunctionBody>("Function") {
     }
 }
 
-export class BString extends BWrapper<string>("String") {
-    toString() {
-        return `"${this.data}"`
-    }
-}
+export class BString extends BWrapper<string>("String") {}
 
 export class BConst extends BValue {
     constructor(type: string) {
