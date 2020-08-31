@@ -1,13 +1,12 @@
-import { Blocks } from "../core"
-import { Parser } from "../parser"
+import { Scope } from "../engine/scope"
 import { Token } from "../lexer"
+import { Parser } from "../parser"
 import { syntaxError } from "../utils/syntax-error"
 import { Expression } from "./expression"
 import { IdentExpr } from "./ident"
 import { postfixParser } from "./postfix-op"
-import { Scope } from "../engine/scope"
 
-export const assignParser = (precedence: number) =>
+export const assign = (precedence: number) =>
     postfixParser(
         precedence,
         (parser: Parser, token: Token, ident: Expression) => {
@@ -22,9 +21,9 @@ export class AssignExpr implements Expression {
     constructor(private name: string, private value: Expression) {}
 
     eval(scope: Scope) {
-        const val = this.value.eval(scope)
-        scope.set(this.name, val)
-        return val
+        const value = this.value.eval(scope)
+        scope.set(this.name, value)
+        return value
     }
 
     print(): string {

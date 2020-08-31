@@ -1,6 +1,6 @@
-import { BlocksParser } from './blocks-parser';
-import { Engine } from './engine/engine';
-import { Lexer } from './lexer';
+import { BlocksParser } from "./blocks-parser"
+import { Engine } from "./engine/engine"
+import { Lexer } from "./lexer"
 
 export class Blocks {
     private lexer = new Lexer()

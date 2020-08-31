@@ -17,10 +17,12 @@ export type TokenType =
     | "block_indent"
     | "comment"
 
+export type Position = [row: number, col: number]
+
 export type Token = {
     type: TokenType
-    start: [line: number, col: number]
-    end: [line: number, col: number]
+    start: Position
+    end: Position
     value: string | Expr[]
 }
 
@@ -363,7 +365,7 @@ export class Lexer {
         }
     }
 
-    private pos(): [row: number, col: number] {
+    private pos(): Position {
         return [this.row, this.col]
     }
 }

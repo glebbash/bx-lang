@@ -3,7 +3,7 @@ export function precedence() {
         MIN: 0,
         MAX: Number.MAX_SAFE_INTEGER,
     }
-    
+
     const insert = (
         name: string,
         after: string,

@@ -1,5 +1,5 @@
-import { Parser } from "../parser"
 import { Token } from "../lexer"
+import { Parser } from "../parser"
 import { Expression } from "./expression"
 
 export interface PostfixParser<T extends Expression = Expression> {

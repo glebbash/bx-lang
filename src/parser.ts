@@ -1,7 +1,7 @@
+import { Expr, Token } from "./lexer"
 import { Expression } from "./syntax/expression"
 import { PostfixParser } from "./syntax/postfix-op"
 import { PrefixParser } from "./syntax/prefix-op"
-import { Expr, Token } from "./lexer"
 import { stream } from "./utils/stream"
 import { syntaxError } from "./utils/syntax-error"
 

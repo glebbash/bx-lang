@@ -1,1 +1,3 @@
-export type BinaryFun<A1 = any, A2 = any, R = any> = (a: A1, b: A2) => R
+import { BValue } from "../engine/engine"
+
+export type BinaryFun = (a: BValue, b: BValue) => BValue

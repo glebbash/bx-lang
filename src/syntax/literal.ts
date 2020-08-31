@@ -1,9 +1,9 @@
-import { BValue } from '../engine/engine';
-import { BNumber, BString } from '../engine/prelude';
-import { Token } from '../lexer';
-import { Parser } from '../parser';
-import { Expression } from './expression';
-import { PrefixParser } from './prefix-op';
+import { BValue } from "../engine/engine"
+import { BNumber, BString } from "../engine/prelude"
+import { Token } from "../lexer"
+import { Parser } from "../parser"
+import { Expression } from "./expression"
+import { PrefixParser } from "./prefix-op"
 
 export const LITERAL: PrefixParser<ConstExpr> = (
     _parser: Parser,
