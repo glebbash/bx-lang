@@ -1,5 +1,5 @@
 import { BValue } from "./engine/engine"
-import { BNumber, bool, BRange } from "./engine/prelude"
+import { BNumber, bool, BRange, BString } from "./engine/prelude"
 import { Parser } from "./parser"
 import { assign } from "./syntax/assign"
 import { binaryOp } from "./syntax/binary-op"
@@ -28,9 +28,19 @@ function num(val: BValue): number {
     return val.as(BNumber).data
 }
 
-const ADD: BinaryFun = (a, b) => new BNumber(num(a) + num(b))
+const ADD: BinaryFun = (a, b) => {
+    if (a.is(BString)) {
+        return new BString(a.data + b.toString())
+    }
+    return new BNumber(num(a) + num(b))
+}
 const SUB: BinaryFun = (a, b) => new BNumber(num(a) - num(b))
-const MUL: BinaryFun = (a, b) => new BNumber(num(a) * num(b))
+const MUL: BinaryFun = (a, b) => {
+    if (a.is(BString)) {
+        return new BString(a.data.repeat(b.as(BNumber).data))
+    }
+    return new BNumber(num(a) * num(b))
+}
 const DIV: BinaryFun = (a, b) => new BNumber(num(a) / num(b))
 const MOD: BinaryFun = (a, b) => new BNumber(num(a) % num(b))
 const POW: BinaryFun = (a, b) => new BNumber(num(a) ** num(b))
@@ -98,7 +108,11 @@ export class BlocksParser extends Parser {
         this.postfix.set(name, doAndAssign(precedence, fun))
     }
 
-    binaryOp([name, precedence]: [string, number], fun: BinaryFun, rightAssoc = false) {
+    binaryOp(
+        [name, precedence]: [string, number],
+        fun: BinaryFun,
+        rightAssoc = false,
+    ) {
         if (this.postfix.has(name)) {
             panic(`Cannot redefine binary op '${name}'`)
         }
