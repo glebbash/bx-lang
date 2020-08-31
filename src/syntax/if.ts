@@ -26,9 +26,9 @@ export class IfExpr implements Expression {
 
     eval(scope: Scope) {
         if (this.cond.eval(scope) === TRUE) {
-            return this.ifTrue.eval(scope)
+            return this.ifTrue.eval(new Scope(scope))
         } else if (this.ifFalse !== undefined) {
-            return this.ifFalse.eval(scope)
+            return this.ifFalse.eval(new Scope(scope))
         }
         return VOID
     }
