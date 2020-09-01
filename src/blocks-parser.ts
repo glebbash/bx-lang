@@ -1,23 +1,26 @@
 import { BValue } from "./engine/engine"
-import { BNumber, bool, BRange, BString } from "./engine/prelude"
+import { BNumber, bool, BRange, BString, TRUE } from "./engine/prelude"
 import { Parser } from "./parser"
+import { ARRAY } from "./syntax/array"
 import { assign } from "./syntax/assign"
 import { binaryOp } from "./syntax/binary-op"
-import { BLOCK } from "./syntax/block"
 import { call } from "./syntax/call"
 import { define } from "./syntax/define"
 import { doAndAssign } from "./syntax/do-and-assign"
+import { dot } from "./syntax/dot"
+import { doubleSemi } from "./syntax/double-semi"
+import { element } from "./syntax/element"
 import { FOR } from "./syntax/for"
 import { FUN } from "./syntax/fun"
 import { IDENT } from "./syntax/ident"
 import { IF } from "./syntax/if"
 import { LITERAL } from "./syntax/literal"
+import { OBJECT } from "./syntax/object"
 import { PAREN } from "./syntax/paren"
 import { PostfixParser } from "./syntax/postfix-op"
 import { PrefixParser } from "./syntax/prefix-op"
 import { PRINT } from "./syntax/print"
 import { RETURN } from "./syntax/return"
-import { TODO } from "./syntax/todo"
 import { unaryOp } from "./syntax/unary-op"
 import { WHILE } from "./syntax/while"
 import { BinaryFun } from "./utils/binary-fun"
@@ -53,9 +56,8 @@ export class BlocksParser extends Parser {
                 .set("<NUMBER>", LITERAL)
                 .set("<STRING>", LITERAL)
                 .set("<BLOCK_PAREN>", PAREN)
-                .set("<BLOCK_BRACE>", BLOCK)
-                .set("<BLOCK_INDENT>", BLOCK)
-                .set("<BLOCK_BRACKET>", TODO),
+                .set("<BLOCK_BRACKET>", ARRAY)
+                .set("<BLOCK_BRACE>", OBJECT),
             new Map<string, PostfixParser>(),
         )
         const prec = precedence()
@@ -78,6 +80,13 @@ export class BlocksParser extends Parser {
         )
 
         this.postfix.set("<BLOCK_PAREN>", call(prec("<CALL>").moreThan("^")[1]))
+        this.postfix.set(
+            "<BLOCK_BRACKET>",
+            element(prec("<ELEM>").sameAs("<CALL>")[1]),
+        )
+
+        this.postfix.set(".", dot(prec(".").moreThan("^")[1]))
+        this.postfix.set("::", doubleSemi(prec("::").sameAs(".")[1]))
 
         this.postfix.set("=", assign(prec("=").lessThan("+")[1]))
         this.doAndAssign(prec("+=").sameAs("="), ADD)
@@ -87,9 +96,9 @@ export class BlocksParser extends Parser {
         this.doAndAssign(prec("%=").sameAs("="), MOD)
         this.doAndAssign(prec("^=").sameAs("="), POW)
 
-        this.unaryOp("-", (a) => -a)
-        this.unaryOp("+", (a) => +a)
-        this.unaryOp("!", (a) => !a)
+        this.unaryOp("-", (a) => new BNumber(-num(a)))
+        this.unaryOp("+", (a) => a)
+        this.unaryOp("!", (a) => bool(a !== TRUE))
 
         this.macro("print", PRINT)
         this.macro("let", define(false))
@@ -119,7 +128,7 @@ export class BlocksParser extends Parser {
         this.postfix.set(name, binaryOp(precedence, fun, rightAssoc))
     }
 
-    unaryOp(value: string, fun: (x: any) => any) {
+    unaryOp(value: string, fun: (x: BValue) => BValue) {
         if (this.prefix.has(value)) {
             panic(`Cannot redefine unary op '${value}'`)
         }
@@ -131,11 +140,5 @@ export class BlocksParser extends Parser {
             panic(`Cannot redefine macro '${value}'`)
         }
         this.prefix.set(value, parser)
-    }
-}
-
-function* rangeIterable(start: number, stop: number) {
-    for (let i = start; i <= stop; i++) {
-        yield i
     }
 }
