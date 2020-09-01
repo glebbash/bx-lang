@@ -108,6 +108,7 @@ export class BlocksParser extends Parser {
         this.macro("for", FOR)
         this.macro("return", RETURN)
         this.macro("fun", FUN)
+        // TODO: break
     }
 
     doAndAssign([name, precedence]: [string, number], fun: BinaryFun) {
