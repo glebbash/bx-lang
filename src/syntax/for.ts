@@ -1,28 +1,28 @@
-import { BRange, BREAK, BReturn, VOID } from "../engine/prelude"
-import { Scope } from "../engine/scope"
-import { Expr } from "../lexer"
+import { Context, subContext } from "../context"
+import { BValue } from "../engine/engine"
+import { BREAK, BReturn, VOID } from "../engine/prelude"
 import { Parser } from "../parser"
-import { syntaxError } from "../utils/syntax-error"
-import { BLOCK } from "./block"
+import { panic } from "../utils/panic"
+import { blockOrExpr } from "./block"
 import { Expression } from "./expression"
-import { IDENT } from "./ident"
+import { expectIndent } from "./ident"
+import { parenExpr } from "./paren"
 import { PrefixParser } from "./prefix-op"
 
 export const FOR: PrefixParser<ForExpr> = (parser: Parser) => {
-    const condExpr = parser.expect({ type: "block_paren" })
-    const exprs = condExpr.value as Expr[]
-    if (exprs.length !== 1) {
-        syntaxError("Multiple expressions in parentheses.", condExpr.start)
+    let name: string
+    let iterable: Expression
+    if (parser.nextIs({ type: "block_paren" })) {
+        const subParser = parser.subParser(parenExpr(parser, parser.next()))
+        name = expectIndent(subParser).name
+        subParser.expect({ value: "in" })
+        iterable = subParser.parseToEnd()
+    } else {
+        name = expectIndent(parser).name
+        parser.expect({ value: "in" })
+        iterable = parser.parse()
     }
-    if (exprs[0].length === 0) {
-        syntaxError("Invalid for loop condition", condExpr.start)
-    }
-    const condParser = parser.subParser(exprs[0])
-    const name = IDENT(condParser, condParser.next()).name
-    condParser.expect({ value: "in" })
-    const iterable = condParser.parse()
-
-    const body = BLOCK(parser, parser.next())
+    const body = blockOrExpr(parser)
     return new ForExpr(name, iterable, body)
 }
 
@@ -33,13 +33,16 @@ export class ForExpr implements Expression {
         private body: Expression,
     ) {}
 
-    eval(scope: Scope) {
-        const iter = this.iterable.eval(scope).as(BRange)
-        const forScope = new Scope(scope)
-        forScope.define(this.name, VOID, false)
+    eval(ctx: Context) {
+        const iter = this.iterable.eval(ctx)
+        if (!isIterable(iter)) {
+            panic(`${iter} is not iterable`)
+        }
+        const forCtx = subContext(ctx)
+        forCtx.scope.define(this.name, VOID, false)
         for (const val of iter) {
-            forScope.set(this.name, val)
-            const res = this.body.eval(forScope)
+            forCtx.scope.set(this.name, val)
+            const res = this.body.eval(forCtx)
             if (res === BREAK) {
                 break
             } else if (res.is(BReturn)) {
@@ -49,9 +52,14 @@ export class ForExpr implements Expression {
         return VOID
     }
 
-    print(): string {
-        return `for (${
-            this.name
-        } in ${this.iterable.print()}) { ${this.body.print()} }`
+    toString(symbol = "", indent = ""): string {
+        return `for ${this.name} in ${this.iterable} ${this.body.toString(
+            symbol,
+            indent,
+        )}`
     }
+}
+
+function isIterable(value: BValue): value is BValue & Iterable<BValue> {
+    return (value as any)[Symbol.iterator] !== undefined
 }

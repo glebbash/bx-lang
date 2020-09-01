@@ -1,17 +1,16 @@
+import { Context, subContext } from "../context"
 import { TRUE, VOID } from "../engine/prelude"
-import { Scope } from "../engine/scope"
 import { Parser } from "../parser"
-import { BLOCK } from "./block"
+import { blockOrExpr } from "./block"
 import { Expression } from "./expression"
-import { PAREN } from "./paren"
 import { PrefixParser } from "./prefix-op"
 
 export const IF: PrefixParser<IfExpr> = (parser: Parser) => {
-    const cond = PAREN(parser, parser.expect({ type: "block_paren" }))
-    const ifTrue = BLOCK(parser, parser.next())
+    const cond = parser.parse()
+    const ifTrue = blockOrExpr(parser)
     if (parser.nextIs({ value: "else" })) {
         parser.next()
-        const ifFalse = BLOCK(parser, parser.next())
+        const ifFalse = blockOrExpr(parser)
         return new IfExpr(cond, ifTrue, ifFalse)
     }
     return new IfExpr(cond, ifTrue)
@@ -24,19 +23,24 @@ export class IfExpr implements Expression {
         private ifFalse?: Expression,
     ) {}
 
-    eval(scope: Scope) {
-        if (this.cond.eval(scope) === TRUE) {
-            return this.ifTrue.eval(new Scope(scope))
+    eval(ctx: Context) {
+        if (this.cond.eval(ctx) === TRUE) {
+            return this.ifTrue.eval(subContext(ctx))
         } else if (this.ifFalse !== undefined) {
-            return this.ifFalse.eval(new Scope(scope))
+            return this.ifFalse.eval(subContext(ctx))
         }
         return VOID
     }
 
-    print(): string {
-        if (this.ifFalse) {
-            return `if ${this.cond.print()} { ${this.ifTrue.print()} } else { ${this.ifFalse.print()} }`
-        }
-        return `if ${this.cond.print()} { ${this.ifTrue.print()} }`
+    toString(symbol = "", indent = ""): string {
+        return (
+            `if ${this.cond.toString(symbol, indent)} ${this.ifTrue.toString(
+                symbol,
+                indent,
+            )}` +
+            (!this.ifFalse
+                ? ""
+                : `else ${this.ifFalse.toString(symbol, indent)}`)
+        )
     }
 }

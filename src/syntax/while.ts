@@ -1,24 +1,23 @@
+import { Context, subContext } from "../context"
 import { BREAK, BReturn, VOID } from "../engine/prelude"
-import { Scope } from "../engine/scope"
 import { Parser } from "../parser"
-import { BLOCK } from "./block"
+import { blockOrExpr } from "./block"
 import { Expression } from "./expression"
-import { PAREN } from "./paren"
 import { PrefixParser } from "./prefix-op"
 
 export const WHILE: PrefixParser<WhileExpr> = (parser: Parser) => {
-    const cond = PAREN(parser, parser.expect({ type: "block_paren" }))
-    const body = BLOCK(parser, parser.next())
+    const cond = parser.parse()
+    const body = blockOrExpr(parser)
     return new WhileExpr(cond, body)
 }
 
 export class WhileExpr implements Expression {
     constructor(private cond: Expression, private body: Expression) {}
 
-    eval(scope: Scope) {
-        const loopScope = new Scope(scope)
-        while (this.cond.eval(scope)) {
-            const res = this.body.eval(loopScope)
+    eval(ctx: Context) {
+        const loopCtx = subContext(ctx)
+        while (this.cond.eval(ctx)) {
+            const res = this.body.eval(loopCtx)
             if (res === BREAK) {
                 break
             } else if (res.is(BReturn)) {
@@ -28,7 +27,10 @@ export class WhileExpr implements Expression {
         return VOID
     }
 
-    print(): string {
-        return `while (${this.cond.print()}) { ${this.body.print()} }`
+    toString(symbol = "", indent = ""): string {
+        return `while ${this.cond} ${this.body.toString(
+            symbol,
+            symbol + indent,
+        )}`
     }
 }
