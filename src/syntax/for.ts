@@ -5,7 +5,7 @@ import { Parser } from "../parser"
 import { panic } from "../utils/panic"
 import { blockOrExpr } from "./block"
 import { Expression } from "./expression"
-import { expectIndent } from "./ident"
+import { expectIdent } from "./ident"
 import { parenExpr } from "./paren"
 import { PrefixParser } from "./prefix-op"
 
@@ -14,11 +14,11 @@ export const FOR: PrefixParser<ForExpr> = (parser: Parser) => {
     let iterable: Expression
     if (parser.nextIs({ type: "block_paren" })) {
         const subParser = parser.subParser(parenExpr(parser, parser.next()))
-        name = expectIndent(subParser).name
+        name = expectIdent(subParser).name
         subParser.expect({ value: "in" })
         iterable = subParser.parseToEnd()
     } else {
-        name = expectIndent(parser).name
+        name = expectIdent(parser).name
         parser.expect({ value: "in" })
         iterable = parser.parse()
     }

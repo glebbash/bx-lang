@@ -5,7 +5,7 @@ import { Parser } from "../parser"
 import { AssignableExpr } from "./assignable"
 import { PrefixParser } from "./prefix-op"
 
-export function expectIndent(
+export function expectIdent(
     parser: Parser,
     includeSpecial = false,
 ): IdentExpr {

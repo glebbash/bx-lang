@@ -4,14 +4,14 @@ import { Token } from "../lexer"
 import { Parser } from "../parser"
 import { ARRAY } from "./array"
 import { Expression } from "./expression"
-import { expectIndent } from "./ident"
+import { expectIdent } from "./ident"
 import { postfixParser } from "./postfix-op"
 
 export const doubleSemi = (precedence: number) =>
     postfixParser(
         precedence,
         (parser: Parser, _token: Token, obj: Expression) => {
-            const name = expectIndent(parser, true).name
+            const name = expectIdent(parser, true).name
             if (parser.nextIs({ type: "block_paren" })) {
                 return new PropCallExpr(
                     name,

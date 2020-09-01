@@ -2,13 +2,13 @@ import { Context } from "../context"
 import { VOID } from "../engine/prelude"
 import { Parser } from "../parser"
 import { Expression } from "./expression"
-import { expectIndent } from "./ident"
+import { expectIdent } from "./ident"
 import { PrefixParser } from "./prefix-op"
 
 export const define = (constant: boolean): PrefixParser<DefineExpr> => (
     parser: Parser,
 ) => {
-    const identExpr = expectIndent(parser)
+    const identExpr = expectIdent(parser)
     parser.expect({ value: "=" })
     return new DefineExpr(identExpr.name, parser.parse(), constant)
 }

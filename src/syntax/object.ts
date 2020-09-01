@@ -4,7 +4,7 @@ import { BObject } from "../engine/prelude"
 import { Expr, Token } from "../lexer"
 import { Parser } from "../parser"
 import { Expression } from "./expression"
-import { expectIndent, IdentExpr } from "./ident"
+import { expectIdent, IdentExpr } from "./ident"
 import { PrefixParser } from "./prefix-op"
 
 type Pair = [string, Expression | null]
@@ -18,7 +18,7 @@ export const OBJECT: PrefixParser<ObjectExpr> = (
     for (const expr of exprs) {
         const subParser = parser.subParser(expr)
         while (subParser.nextToken(false) !== null) {
-            const name = expectIndent(subParser).name
+            const name = expectIdent(subParser).name
             const value = subParser.nextIs({ value: ":" })
                 ? (subParser.next(), subParser.parse())
                 : null
