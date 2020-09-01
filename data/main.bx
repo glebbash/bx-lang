@@ -1,8 +1,11 @@
-fun sum(x, y) x + y
-print sum(2, 2)
-
-fun add(x) fun(y) x + y
-print add(2)(2)
-
 const bum = [1, 2, 3]
-print bum.map(fun(x) x + 1)
+
+print bum
+    .map(fun(x) x + 1)
+    .map(fun(x) x * 3)
+
+print 2 + 2
+    * 2
+
+print 2 * 2
+    + 2

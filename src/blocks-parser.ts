@@ -14,6 +14,7 @@ import { FOR } from "./syntax/for"
 import { FUN } from "./syntax/fun"
 import { IDENT } from "./syntax/ident"
 import { IF } from "./syntax/if"
+import { INDENT } from "./syntax/indent"
 import { LITERAL } from "./syntax/literal"
 import { OBJECT } from "./syntax/object"
 import { PAREN } from "./syntax/paren"
@@ -84,6 +85,7 @@ export class BlocksParser extends Parser {
             "<BLOCK_BRACKET>",
             element(prec("<ELEM>").sameAs("<CALL>")[1]),
         )
+        this.postfix.set("<BLOCK_INDENT>", INDENT)
 
         this.postfix.set(".", dot(prec(".").moreThan("^")[1]))
         this.postfix.set("::", doubleSemi(prec("::").sameAs(".")[1]))
