@@ -1,8 +1,8 @@
+import { Context } from "../context"
 import { BValue } from "../engine/engine"
-import { Scope } from "../engine/scope"
 
 export interface Expression {
-    eval(scope: Scope): BValue
+    eval(ctx: Context): BValue
 
-    print(): string
+    toString(symbol?: string, indent?: string): string
 }

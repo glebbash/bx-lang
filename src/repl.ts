@@ -1,8 +1,10 @@
 import readline from "readline"
-
-import { Blocks } from "./core"
+import { Blocks } from "./blocks"
+import { Context } from "./context"
+import { Scope } from "./engine/scope"
 
 const core = new Blocks()
+const evalCtx: Context = { scope: new Scope(core.globalScope), core }
 
 process.stdout.write("> ")
 
@@ -14,8 +16,8 @@ readline
     })
     .on("line", function (line) {
         try {
-            const res = core.eval(line)
-            console.log("=", res)
+            const res = core.eval(line, evalCtx)
+            console.log("=", res.toString())
         } catch (e) {
             console.log("!", e.toString())
         }
