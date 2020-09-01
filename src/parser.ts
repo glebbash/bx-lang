@@ -63,11 +63,17 @@ export class Parser {
     }
 
     tokenPrecedence(): number {
-        const value = this.nextToken(false)
+        const token = this.nextToken(false)
+        if (token == null) return 0
 
-        if (value == null) return 0
+        const parser = this.getPostfixParser(token, false)
+        if (parser === undefined) return 0
 
-        return this.getPostfixParser(value, false)?.precedence ?? 0
+        if (typeof parser.precedence === "function") {
+            return parser.precedence(this)
+        }
+
+        return parser.precedence
     }
 
     getPrefixParser(token: Token): PrefixParser
