@@ -1,6 +1,6 @@
-import { readFileSync } from 'fs';
-
-import { Blocks } from '../src/core';
+import { readFileSync } from "fs"
+import { Blocks } from "../src/blocks"
 
 const data = readFileSync("data/main.bx", { encoding: "utf-8" })
-new Blocks().eval(data)
+const core = new Blocks()
+core.eval(data)

@@ -1,6 +1,5 @@
-import { readFileSync } from 'fs';
-
-import { Lexer } from './lexer';
+import { readFileSync } from "fs"
+import { Lexer } from "../src/lexer"
 
 const data = readFileSync("data/main.bx", { encoding: "utf-8" })
 const tokens = new Lexer().tokenize(data)

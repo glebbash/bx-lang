@@ -1,7 +1,6 @@
-import Benchmark from 'benchmark';
-import { readFileSync } from 'fs';
-
-import { Lexer } from '../../src/lexer';
+import Benchmark from "benchmark"
+import { readFileSync } from "fs"
+import { Lexer } from "../../src/lexer"
 
 const data = readFileSync("data/test1.bx", { encoding: "utf-8" })
 
