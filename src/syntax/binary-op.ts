@@ -1,6 +1,4 @@
 import { Context } from "../context"
-import { Token } from "../lexer"
-import { Parser } from "../parser"
 import { BinaryFun } from "../utils/binary-fun"
 import { Expression } from "./expression"
 import { postfixParser } from "./postfix-op"
@@ -10,13 +8,10 @@ export const binaryOp = (
     fun: BinaryFun,
     rightAssoc = false,
 ) =>
-    postfixParser(
-        precedence,
-        (parser: Parser, token: Token, expr1: Expression) => {
-            const expr2 = parser.parse(precedence - (rightAssoc ? 1 : 0))
-            return new BinaryOpExpr(token.value as string, expr1, expr2, fun)
-        },
-    )
+    postfixParser(precedence, (parser, token, expr1) => {
+        const expr2 = parser.parse(precedence - (rightAssoc ? 1 : 0))
+        return new BinaryOpExpr(token.value as string, expr1, expr2, fun)
+    })
 
 export class BinaryOpExpr implements Expression {
     constructor(

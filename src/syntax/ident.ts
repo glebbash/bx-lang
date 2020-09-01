@@ -5,10 +5,7 @@ import { Parser } from "../parser"
 import { AssignableExpr } from "./assignable"
 import { PrefixParser } from "./prefix-op"
 
-export function expectIdent(
-    parser: Parser,
-    includeSpecial = false,
-): IdentExpr {
+export function expectIdent(parser: Parser, includeSpecial = false): IdentExpr {
     if (includeSpecial) {
         return IDENT(parser, parser.expect({ type: "identifier" }))
     }
