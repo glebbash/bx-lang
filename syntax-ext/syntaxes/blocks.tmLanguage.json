@@ -1,0 +1,151 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Blocks",
+	"patterns": [
+		{ "include": "#all" }
+	],
+	"repository": {
+		"all": {
+			"patterns": [
+				{ "include": "#space" },
+				{ "include": "#keywords" },
+				{ "include": "#functions" },
+				{ "include": "#definitions" },
+				{ "include": "#operators" },
+				{ "include": "#comments" },
+				{ "include": "#ml-comments" },
+				{ "include": "#parens" },
+				{ "include": "#braces" },
+				{ "include": "#brackets" },
+				{ "include": "#strings" },
+				{ "include": "#sq-strings" },
+				{ "include": "#numbers" }
+			]
+		},
+		"space": {
+			"match": "\\s+"
+		},
+		"comments": {
+			"match": "(//).*$\n?",
+			"name": "comment.line"
+		},
+		"ml-comments": {
+			"begin": "/\\*",
+			"end": "\\*/",
+			"name": "comment.multiline"
+		},
+		"keywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.blocks",
+					"match": "\\b(if|while|for|return|fun|in|else)\\b"
+				}
+			]
+		},
+		"functions": {
+			"patterns": [
+				{
+					"name": "entity.name.function.blocks",
+					"match": "\\b(print)\\b"
+				}
+			]
+		},
+		"definitions": {
+			"patterns": [
+				{
+					"name": "storage.type.blocks",
+					"match": "\\b(let|const)\\b"
+				}
+			]
+		},
+		"strings": {
+			"name": "string.quoted.double.blocks",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.blocks",
+					"match": "\\\\."
+				}
+			]
+		},
+		"sq-strings": {
+			"name": "string.quoted.single.blocks",
+			"begin": "'",
+			"end": "'",
+			"patterns": [
+				{
+					"name": "constant.character.escape.blocks",
+					"match": "\\\\."
+				}
+			]
+		},
+		"parens": {
+			"begin": "\\(",
+			"end": "\\)",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.paren.open"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.paren.close"
+				}
+			},
+			"name": "expression.group",
+			"patterns": [{
+				"include": "#all"
+			}]
+		},
+		"braces": {
+			"begin": "\\{",
+			"end": "\\}",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.paren.open"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.paren.close"
+				}
+			},
+			"name": "expression.group",
+			"patterns": [{
+				"include": "#all"
+			}]
+		},
+		"brackets": {
+			"begin": "\\[",
+			"end": "\\]",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.paren.open"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.paren.close"
+				}
+			},
+			"name": "expression.group",
+			"patterns": [{
+				"include": "#all"
+			}]
+		},
+		"numbers": {
+			"match": "(?<!\\w)[\\+\\-]?[0-9][0-9_]*(?:\\.[0-9][0-9_]*)?\\b",
+			"name": "constant.numeric"
+		},
+		"operators": {
+			"patterns": [
+				{
+					"name": "keyword.control.operator.blocks",
+					"match": "\\+|-|\\*|/|%|\\^|==|\\!=|>|<|>=|<=|\\.\\.|\\.|::|:|=|\\+=|-=|\\*=|/=|%=|\\^=|\\!"
+				}
+			]
+		}
+	},
+	"scopeName": "source.blocks"
+}
