@@ -1,32 +1,38 @@
-import { Scope } from "../engine/scope"
+import { Context } from "../context"
 import { Token } from "../lexer"
 import { Parser } from "../parser"
-import { syntaxError } from "../utils/syntax-error"
+import { AssignableExpr } from "./assignable"
 import { Expression } from "./expression"
-import { IdentExpr } from "./ident"
 import { postfixParser } from "./postfix-op"
 
 export const assign = (precedence: number) =>
     postfixParser(
         precedence,
-        (parser: Parser, token: Token, ident: Expression) => {
-            if (!(ident instanceof IdentExpr)) {
-                syntaxError("Unexpected token " + token.value, token.start)
+        (parser: Parser, token: Token, assignable: Expression) => {
+            if (!(assignable instanceof AssignableExpr)) {
+                parser.unexpectedToken(token)
             }
-            return new AssignExpr(ident.name, parser.parse(precedence))
+            // right associative
+            return new AssignExpr(assignable, parser.parse(precedence - 1))
         },
     )
 
 export class AssignExpr implements Expression {
-    constructor(private name: string, private value: Expression) {}
+    constructor(
+        private assignable: AssignableExpr,
+        private value: Expression,
+    ) {}
 
-    eval(scope: Scope) {
-        const value = this.value.eval(scope)
-        scope.set(this.name, value)
+    eval(ctx: Context) {
+        const value = this.value.eval(ctx)
+        this.assignable.assign(ctx, value)
         return value
     }
 
-    print(): string {
-        return this.name + " = " + this.value.print()
+    toString(symbol = "", indent = ""): string {
+        return `${indent}${this.assignable} = ${this.value.toString(
+            symbol,
+            indent,
+        )}`
     }
 }

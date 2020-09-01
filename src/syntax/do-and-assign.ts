@@ -1,21 +1,20 @@
-import { Scope } from "../engine/scope"
+import { Context } from "../context"
 import { Token } from "../lexer"
 import { Parser } from "../parser"
 import { BinaryFun } from "../utils/binary-fun"
-import { syntaxError } from "../utils/syntax-error"
+import { AssignableExpr } from "./assignable"
 import { Expression } from "./expression"
-import { IdentExpr } from "./ident"
 import { postfixParser } from "./postfix-op"
 
 export const doAndAssign = (precedence: number, fun: BinaryFun) =>
     postfixParser(
         precedence,
-        (parser: Parser, token: Token, ident: Expression) => {
-            if (!(ident instanceof IdentExpr)) {
-                syntaxError("Unexpected token " + token.value, token.start)
+        (parser: Parser, token: Token, assignable: Expression) => {
+            if (!(assignable instanceof AssignableExpr)) {
+                parser.unexpectedToken(token)
             }
             return new DoAndAssignExpr(
-                ident.name,
+                assignable,
                 parser.parse(precedence),
                 fun,
             )
@@ -24,19 +23,19 @@ export const doAndAssign = (precedence: number, fun: BinaryFun) =>
 
 export class DoAndAssignExpr implements Expression {
     constructor(
-        private name: string,
+        private assignable: AssignableExpr,
         private value: Expression,
         private fun: BinaryFun,
     ) {}
 
-    eval(scope: Scope) {
-        const value = this.value.eval(scope)
-        const prev = scope.get(this.name)
-        scope.set(this.name, this.fun(prev, value))
+    eval(ctx: Context) {
+        const value = this.value.eval(ctx)
+        const prev = this.assignable.eval(ctx)
+        this.assignable.assign(ctx, this.fun(prev, value))
         return value
     }
 
-    print(): string {
-        return this.name + " = " + this.value.print()
+    toString(symbol = "", indent = ""): string {
+        return `${this.assignable} = ${this.value}`
     }
 }
