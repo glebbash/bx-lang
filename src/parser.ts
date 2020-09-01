@@ -23,21 +23,17 @@ export class Parser {
     constructor(
         public prefix: Map<string, PrefixParser>,
         public postfix: Map<string, PostfixParser>,
-        private nextToken: TokenStream = null as any,
+        public nextToken: TokenStream = null as any,
     ) {}
 
     subParser(expr: Expr): Parser {
         return new Parser(this.prefix, this.postfix, stream(expr))
     }
 
-    parseSubExpr(expr: Expr): Expression {
-        return this.subParser(expr).parse()
-    }
-
     parseAll(exprs: Expr[]): Expression[] {
         return exprs.map((expr) => {
             this.nextToken = stream(expr)
-            return this.parse()
+            return this.parseToEnd()
         })
     }
 
@@ -50,15 +46,20 @@ export class Parser {
             expr = this.getPostfixParser(token)(this, token, expr)
         }
 
-        const next = this.nextToken(false)
-        if (next !== null && !this.getPostfixParser(next, false)) {
-            syntaxError(
-                "Invalid operator " + this.getTokenType(next),
-                next.start,
-            )
-        }
-
         return expr
+    }
+
+    parseToEnd(precedence = 0): Expression {
+        const expr = this.parse(precedence)
+        this.checkTrailing()
+        return expr
+    }
+
+    checkTrailing() {
+        const next = this.nextToken(false)
+        if (next !== null) {
+            this.unexpectedToken(next)
+        }
     }
 
     tokenPrecedence(): number {
@@ -91,12 +92,7 @@ export class Parser {
 
     expect<T extends TokenCondition>(cond: T): Token {
         if (!this.nextIs(cond)) {
-            const next = this.nextToken(false)
-            const unexpected = next === null ? "EOF" : this.getTokenType(next)
-            syntaxError(
-                `Unexpected token '${unexpected}'`,
-                (next ?? this.prevToken).start,
-            )
+            this.unexpectedToken(this.nextToken(false))
         }
         return this.next() as any
     }
@@ -118,7 +114,7 @@ export class Parser {
     next(consume = true): Token {
         const token = this.nextToken(consume)
         if (token === null) {
-            syntaxError("Expected more tokens", this.prevToken.end)
+            this.unexpectedToken(token)
         }
         this.prevToken = token
         return token
@@ -146,7 +142,16 @@ export class Parser {
                 }
                 return "<IDENT>"
             default:
-                syntaxError(`Unexpected token: ${token.type}`, token.start)
+                this.unexpectedToken(token)
         }
+    }
+
+    unexpectedToken(token: Token | null): never {
+        return token === null
+            ? syntaxError("Unexpected end of expression", this.prevToken.end)
+            : syntaxError(
+                  `Unexpected token: '${this.getTokenType(token)}'`,
+                  token.start,
+              )
     }
 }
