@@ -1,23 +1,41 @@
+import { Context } from "../context"
 import { BValue } from "../engine/engine"
 import { BReturn, VOID } from "../engine/prelude"
-import { Scope } from "../engine/scope"
 import { Expr, Token } from "../lexer"
 import { Parser } from "../parser"
 import { Expression } from "./expression"
 import { PrefixParser } from "./prefix-op"
 
-export const BLOCK: PrefixParser = (parser: Parser, token: Token) => {
+export function blockOrExpr(parser: Parser): Expression {
+    return isBlock(parser.next(false)) ? expectBlock(parser) : parser.parse()
+}
+export function isBlock(token: Token): boolean {
+    return token.type === "block_brace" || token.type === "block_indent"
+}
+
+export function expectBlock(parser: Parser): BlockExpr {
+    const token = parser.next()
+
+    return isBlock(token) ? BLOCK(parser, token) : parser.unexpectedToken(token)
+}
+
+export const BLOCK: PrefixParser<BlockExpr> = (
+    parser: Parser,
+    token: Token,
+) => {
     const exprs = token.value as Expr[]
-    return new BlockExpr(exprs.map((expr) => parser.parseSubExpr(expr)))
+    return new BlockExpr(
+        exprs.map((expr) => parser.subParser(expr).parseToEnd()),
+    )
 }
 
 export class BlockExpr implements Expression {
     constructor(private body: Expression[]) {}
 
-    eval(scope: Scope) {
+    eval(ctx: Context) {
         let res: BValue = VOID
         for (const expr of this.body) {
-            res = expr.eval(scope)
+            res = expr.eval(ctx)
             if (res.is(BReturn)) {
                 return res
             }
@@ -25,7 +43,10 @@ export class BlockExpr implements Expression {
         return res
     }
 
-    print(): string {
-        return `{${this.body.map((it) => it.print()).join(";")};}`
+    toString(symbol = "", indent = ""): string {
+        const bodyIndent = this.body.length > 1 ? indent + symbol : ""
+        return `${indent}{\n${this.body
+            .map((it) => it.toString(symbol, bodyIndent))
+            .join("\n")}\n${indent}}`
     }
 }

@@ -1,5 +1,5 @@
+import { Context } from "../context"
 import { BValue } from "../engine/engine"
-import { Scope } from "../engine/scope"
 import { Token } from "../lexer"
 import { Parser } from "../parser"
 import { Expression } from "./expression"
@@ -20,11 +20,11 @@ export class UnaryOpExpr implements Expression {
         private fun: (x: BValue) => BValue,
     ) {}
 
-    eval(scope: Scope) {
-        return this.fun(this.expr.eval(scope))
+    eval(ctx: Context) {
+        return this.fun(this.expr.eval(ctx))
     }
 
-    print(): string {
-        return this.operator + this.expr.print()
+    toString(symbol = "", indent = ""): string {
+        return this.operator + this.expr.toString(symbol, indent)
     }
 }

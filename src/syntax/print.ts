@@ -1,5 +1,5 @@
+import { Context } from "../context"
 import { VOID } from "../engine/prelude"
-import { Scope } from "../engine/scope"
 import { Parser } from "../parser"
 import { Expression } from "./expression"
 import { PrefixParser } from "./prefix-op"
@@ -11,12 +11,12 @@ export const PRINT: PrefixParser<PrintExpr> = (parser: Parser) => {
 export class PrintExpr implements Expression {
     constructor(private value: Expression) {}
 
-    eval(scope: Scope) {
-        console.log(this.value.eval(scope).toString())
+    eval(ctx: Context) {
+        console.log(this.value.eval(ctx).toString())
         return VOID
     }
 
-    print(): string {
-        return `print ${this.value.print()}`
+    toString(symbol = "", indent = ""): string {
+        return `print ${this.value.toString(symbol, indent)}`
     }
 }

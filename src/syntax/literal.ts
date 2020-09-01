@@ -22,7 +22,7 @@ export class ConstExpr implements Expression {
         return this.value
     }
 
-    print(): string {
-        return "" + this.value
+    toString(): string {
+        return this.value.toString()
     }
 }

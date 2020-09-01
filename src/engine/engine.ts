@@ -1,6 +1,5 @@
 import { AutoMap } from "../utils/auto-map"
 import { panic } from "../utils/panic"
-import { Scope } from "./scope"
 
 export type BMethod = (self: BValue, ...args: BValue[]) => BValue
 export type BMethodBound = (...args: BValue[]) => BValue
@@ -87,7 +86,6 @@ export function BWrapper<T>(type: string) {
 
 export class Engine {
     private types = new Map<string, BType>()
-    public scope = new Scope()
 
     addType(name: string, parent?: string) {
         const type = new BType(this, name, parent)

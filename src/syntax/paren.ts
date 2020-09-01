@@ -1,17 +1,38 @@
-import { VOID } from "../engine/prelude"
+import { Context } from "../context"
+import { BValue } from "../engine/engine"
 import { Expr, Token } from "../lexer"
 import { Parser } from "../parser"
 import { syntaxError } from "../utils/syntax-error"
-import { ConstExpr } from "./literal"
+import { Expression } from "./expression"
 import { PrefixParser } from "./prefix-op"
 
-export const PAREN: PrefixParser = (parser: Parser, token: Token) => {
+export function parenExpr(parser: Parser, token: Token): Expr {
     const exprs = token.value as Expr[]
     if (exprs.length !== 1) {
         syntaxError("Multiple expressions in parentheses.", token.start)
     }
     if (exprs[0].length === 0) {
-        return new ConstExpr(VOID)
+        parser.unexpectedToken(token)
     }
-    return parser.parseSubExpr(exprs[0])
+    return exprs[0]
+}
+
+export const PAREN: PrefixParser<ParenExpr> = (
+    parser: Parser,
+    token: Token,
+) => {
+    const expr = parenExpr(parser, token)
+    return new ParenExpr(parser.subParser(expr).parseToEnd())
+}
+
+export class ParenExpr implements Expression {
+    constructor(public expr: Expression) {}
+
+    eval(ctx: Context): BValue {
+        return this.expr.eval(ctx)
+    }
+
+    toString(symbol = "", indent = ""): string {
+        return `(${this.expr.toString(symbol, indent)})`
+    }
 }

@@ -1,5 +1,5 @@
+import { Context } from "../context"
 import { BReturn } from "../engine/prelude"
-import { Scope } from "../engine/scope"
 import { Parser } from "../parser"
 import { Expression } from "./expression"
 import { PrefixParser } from "./prefix-op"
@@ -11,11 +11,11 @@ export const RETURN: PrefixParser<ReturnExpr> = (parser: Parser) => {
 export class ReturnExpr implements Expression {
     constructor(private value: Expression) {}
 
-    eval(scope: Scope) {
-        return new BReturn(this.value.eval(scope))
+    eval(ctx: Context) {
+        return new BReturn(this.value.eval(ctx))
     }
 
-    print(): string {
-        return `return ${this.value.print()}`
+    toString(symbol = "", indent = ""): string {
+        return `return ${this.value.toString(symbol, indent)}`
     }
 }

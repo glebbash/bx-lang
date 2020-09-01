@@ -1,4 +1,4 @@
-import { Scope } from "../engine/scope"
+import { Context } from "../context"
 import { Token } from "../lexer"
 import { Parser } from "../parser"
 import { BinaryFun } from "../utils/binary-fun"
@@ -26,14 +26,12 @@ export class BinaryOpExpr implements Expression {
         private fun: BinaryFun,
     ) {}
 
-    eval(scope: Scope) {
-        const value = this.fun(this.expr1.eval(scope), this.expr2.eval(scope))
+    eval(ctx: Context) {
+        const value = this.fun(this.expr1.eval(ctx), this.expr2.eval(ctx))
         return value
     }
 
-    print(): string {
-        return (
-            this.expr1.print() + " " + this.operator + " " + this.expr2.print()
-        )
+    toString(_symbol = "", indent = ""): string {
+        return `${indent}${this.expr1} ${this.operator} ${this.expr2}`
     }
 }
