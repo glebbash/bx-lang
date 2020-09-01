@@ -1,29 +1,30 @@
+import { Context } from "../context"
 import { BFunction } from "../engine/prelude"
-import { Scope } from "../engine/scope"
 import { Token } from "../lexer"
 import { Parser } from "../parser"
+import { ARRAY, ArrayExpr } from "./array"
 import { Expression } from "./expression"
-import { PAREN } from "./paren"
 import { postfixParser } from "./postfix-op"
 
 export const call = (precedence: number) =>
     postfixParser(
         precedence,
         (parser: Parser, token: Token, expr: Expression) => {
-            return new CallExpr(expr, PAREN(parser, token))
+            return new CallExpr(expr, ARRAY(parser, token))
         },
     )
 
 export class CallExpr implements Expression {
-    constructor(private fun: Expression, private args: Expression) {}
+    constructor(private fun: Expression, private args: ArrayExpr) {}
 
-    eval(scope: Scope) {
-        const fun = this.fun.eval(scope)
-        const value = fun.as(BFunction).call(this.args.eval(scope))
+    eval(ctx: Context) {
+        const fun = this.fun.eval(ctx).as(BFunction)
+        const args = this.args.items.map((arg) => arg.eval(ctx))
+        const value = fun.call(...args)
         return value
     }
 
-    print(): string {
-        return `${this.fun.print()}(${this.args.print()})`
+    toString(symbol = "", indent = ""): string {
+        return `${this.fun}(${this.args.toString(symbol, indent).slice(1, -1)})`
     }
 }
