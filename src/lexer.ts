@@ -41,9 +41,9 @@ export type LexerConfig = {
 }
 
 const DEFAULT_CONFIG: LexerConfig = {
-    singleLineCommentStart: ";",
-    multiLineCommentStart: null,
-    multiLineCommentEnd: null,
+    singleLineCommentStart: "//",
+    multiLineCommentStart: "/*",
+    multiLineCommentEnd: "*/",
     whitespaceRegex: /[ \n\t\v\r\f]/,
     numberStartRegex: /\d/,
     numberRegex: /\d/,
