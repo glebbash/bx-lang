@@ -79,7 +79,7 @@
 			"patterns": [
 				{
 					"name": "keyword.control.blocks",
-					"match": "\\b(if|while|for|return|fun|in|else|class)\\b"
+					"match": "\\b(if|while|for|return|fun|in|else|class|export|import)\\b"
 				},
 				{
 					"name": "entity.name.function.blocks",
