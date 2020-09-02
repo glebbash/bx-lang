@@ -2,37 +2,63 @@
 	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
 	"name": "Blocks",
 	"patterns": [
-		{ "include": "#all" }
+		{
+			"include": "#all"
+		}
 	],
 	"repository": {
 		"all": {
 			"patterns": [
-				{ "include": "#space" },
-				{ "include": "#keywords" },
-				{ "include": "#functions" },
-				{ "include": "#definitions" },
-				{ "include": "#operators" },
-				{ "include": "#comments" },
-				{ "include": "#ml-comments" },
-				{ "include": "#parens" },
-				{ "include": "#braces" },
-				{ "include": "#brackets" },
-				{ "include": "#strings" },
-				{ "include": "#sq-strings" },
-				{ "include": "#numbers" }
+				{
+					"include": "#comments"
+				},
+				{
+					"include": "#ml-comments"
+				},
+				{
+					"include": "#keywords"
+				},
+				{
+					"include": "#functions"
+				},
+				{
+					"include": "#definitions"
+				},
+				{
+					"include": "#operators"
+				},
+				{
+					"include": "#parens"
+				},
+				{
+					"include": "#braces"
+				},
+				{
+					"include": "#brackets"
+				},
+				{
+					"include": "#strings"
+				},
+				{
+					"include": "#sq-strings"
+				},
+				{
+					"include": "#numbers"
+				}
 			]
 		},
-		"space": {
-			"match": "\\s+"
-		},
 		"comments": {
-			"match": "(//).*$\n?",
-			"name": "comment.line"
+			"name": "comment.line.double-slash.blocks",
+			"begin": "//",
+			"end": "\n"
 		},
 		"ml-comments": {
+			"name": "comment.block.blocks",
 			"begin": "/\\*",
 			"end": "\\*/",
-			"name": "comment.multiline"
+			"patterns": [
+				{ "include": "#ml-comments" }
+			]
 		},
 		"keywords": {
 			"patterns": [
@@ -94,9 +120,11 @@
 				}
 			},
 			"name": "expression.group",
-			"patterns": [{
-				"include": "#all"
-			}]
+			"patterns": [
+				{
+					"include": "#all"
+				}
+			]
 		},
 		"braces": {
 			"begin": "\\{",
@@ -112,9 +140,11 @@
 				}
 			},
 			"name": "expression.group",
-			"patterns": [{
-				"include": "#all"
-			}]
+			"patterns": [
+				{
+					"include": "#all"
+				}
+			]
 		},
 		"brackets": {
 			"begin": "\\[",
@@ -130,9 +160,11 @@
 				}
 			},
 			"name": "expression.group",
-			"patterns": [{
-				"include": "#all"
-			}]
+			"patterns": [
+				{
+					"include": "#all"
+				}
+			]
 		},
 		"numbers": {
 			"match": "(?<!\\w)[\\+\\-]?[0-9][0-9_]*(?:\\.[0-9][0-9_]*)?\\b",
