@@ -23,11 +23,12 @@ export class DoAndAssignExpr implements Expression {
     eval(ctx: Context) {
         const value = this.value.eval(ctx)
         const prev = this.assignable.eval(ctx)
-        this.assignable.assign(ctx, this.fun(prev, value))
-        return value
+        const res = this.fun(prev, value)
+        this.assignable.assign(ctx, res)
+        return res
     }
 
     toString(symbol = "", indent = ""): string {
-        return `${this.assignable} = ${this.value}`
+        return `${this.assignable.toString(symbol, indent)} = ${this.value}`
     }
 }

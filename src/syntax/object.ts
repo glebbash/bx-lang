@@ -7,14 +7,14 @@ import { Expression } from "./expression"
 import { expectIdent, IdentExpr } from "./ident"
 import { PrefixParser } from "./prefix-op"
 
-type Pair = [string, Expression | null]
+export type KVPair = [string, Expression | null]
 
 export const OBJECT: PrefixParser<ObjectExpr> = (
     parser: Parser,
     token: Token,
 ) => {
     const exprs = token.value as Expr[]
-    const pairs: Pair[] = []
+    const pairs: KVPair[] = []
     for (const expr of exprs) {
         const subParser = parser.subParser(expr)
         while (subParser.nextToken(false) !== null) {
@@ -32,7 +32,7 @@ export const OBJECT: PrefixParser<ObjectExpr> = (
 }
 
 export class ObjectExpr implements Expression {
-    constructor(public pairs: Pair[]) {}
+    constructor(public pairs: KVPair[]) {}
 
     eval(ctx: Context): BValue {
         const data: Record<string, BValue> = {}
