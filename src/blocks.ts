@@ -29,17 +29,6 @@ export class Blocks extends Core {
                     .as(BArray)
                     .data.reduce((acc, val) => fun.call(acc, val), init)
             })
-
-        this.globalScope.define(
-            "require",
-            new BFunction((val: BValue) => {
-                const name = val.as(BString).data
-                return this.eval(
-                    readFileSync("data/" + name + ".bx", { encoding: "utf-8" }),
-                )
-            }),
-            true,
-        )
         this.globalScope.define(
             "pp",
             new BFunction((val: BValue) => {

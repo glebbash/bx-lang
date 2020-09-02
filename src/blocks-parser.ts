@@ -18,10 +18,12 @@ import { doAndAssign } from "./syntax/do-and-assign"
 import { dot } from "./syntax/dot"
 import { doubleSemi } from "./syntax/double-semi"
 import { element } from "./syntax/element"
+import { EXPORT } from "./syntax/export"
 import { FOR } from "./syntax/for"
 import { FUN } from "./syntax/fun"
 import { IDENT } from "./syntax/ident"
 import { IF } from "./syntax/if"
+import { IMPORT } from "./syntax/import"
 import { INDENT } from "./syntax/indent"
 import { LITERAL } from "./syntax/literal"
 import { OBJECT } from "./syntax/object"
@@ -129,6 +131,8 @@ export class BlocksParser extends Parser {
         this.macro("for", FOR)
         this.macro("return", RETURN)
         this.macro("fun", FUN)
+        this.macro("export", EXPORT)
+        this.macro("import", IMPORT)
         // TODO: break
     }
 

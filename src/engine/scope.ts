@@ -9,7 +9,11 @@ export type Cell = {
 export class Scope {
     private data = new Map<string, Cell>()
 
-    constructor(private parent?: Scope) {}
+    // prettier-ignore
+    constructor(
+        private parent?: Scope,
+        public exports: Set<string> | null = null,
+    ) {}
 
     has(name: string): boolean {
         return this.data.has(name)

@@ -35,7 +35,7 @@ export const define = (
 
 export class DefineIdentExpr implements Expression {
     constructor(
-        private name: string,
+        public name: string,
         private expr: Expression,
         private constant: boolean,
     ) {}

@@ -1,11 +1,4 @@
-const bum = [1, 2, 3]
+import math::{ add, sub }
 
-print bum
-    .map(fun(x) x + 1)
-    .map(fun(x) x * 3)
-
-print 2 + 2
-    * 2
-
-print 2 * 2
-    + 2
+print add(2, 2)
+print sub(10, 6)

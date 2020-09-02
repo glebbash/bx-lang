@@ -30,7 +30,7 @@ export const FUN: PrefixParser<FunExpr> = (parser: Parser) => {
 
 export class FunExpr implements Expression {
     constructor(
-        private name: string | null,
+        public name: string | null,
         private params: string[],
         private body: Expression,
     ) {}
