@@ -316,9 +316,17 @@ export class Lexer {
 
     private skipMultiLineComment(): string {
         let buff = ""
+        let opened = 1
         while (true) {
+            if (this.skipSequence(this.config.multiLineCommentStart!)) {
+                opened++
+                buff += this.config.multiLineCommentStart!
+            }
             if (this.skipSequence(this.config.multiLineCommentEnd!)) {
-                break
+                if (--opened === 0) {
+                    break
+                }
+                buff += this.config.multiLineCommentEnd!
             }
             buff += this.char
             this.next()

@@ -1,5 +1,13 @@
 import { BValue } from "./engine/engine"
-import { BNumber, bool, BRange, BString, TRUE } from "./engine/prelude"
+import {
+    BArray,
+    BNumber,
+    BObject,
+    bool,
+    BRange,
+    BString,
+    TRUE,
+} from "./engine/prelude"
 import { Parser } from "./parser"
 import { ARRAY } from "./syntax/array"
 import { assign } from "./syntax/assign"
@@ -25,6 +33,7 @@ import { RETURN } from "./syntax/return"
 import { unaryOp } from "./syntax/unary-op"
 import { WHILE } from "./syntax/while"
 import { BinaryFun } from "./utils/binary-fun"
+import { format, formatN } from "./utils/format"
 import { panic } from "./utils/panic"
 import { precedence } from "./utils/relative-prec"
 
@@ -46,7 +55,17 @@ const MUL: BinaryFun = (a, b) => {
     return new BNumber(num(a) * num(b))
 }
 const DIV: BinaryFun = (a, b) => new BNumber(num(a) / num(b))
-const MOD: BinaryFun = (a, b) => new BNumber(num(a) % num(b))
+const MOD: BinaryFun = (a, b) => {
+    if (a.is(BString)) {
+        const template = a.data
+        if (b.is(BObject)) {
+            return new BString(formatN(template, b.data))
+        } else {
+            return new BString(format(template, ...b.as(BArray).data))
+        }
+    }
+    return new BNumber(num(a) % num(b))
+}
 const POW: BinaryFun = (a, b) => new BNumber(num(a) ** num(b))
 
 export class BlocksParser extends Parser {
