@@ -1,4 +1,3 @@
-import { readFileSync } from "fs"
 import { BlocksParser } from "./blocks-parser"
 import { Core } from "./core"
 import { BValue, Engine } from "./engine/engine"

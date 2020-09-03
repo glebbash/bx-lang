@@ -1,17 +1,15 @@
 {
   "name": "blocks",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Blocks programming language interpreter",
+  "main": "dist/blocks.js",
   "scripts": {
     "start": "ts-node tests/eval",
     "test": "tsc && nyc mocha"
   },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "array-n": "^1.0.0"
-  },
+  "author": "glebbash",
+  "license": "MIT",
+  "dependencies": {},
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/benchmark": "^1.0.33",
