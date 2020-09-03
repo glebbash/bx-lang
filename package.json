@@ -9,6 +9,14 @@
   },
   "author": "glebbash",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/glebbash/bx-lang.git"
+  },
+  "bugs": {
+    "url": "https://github.com/glebbash/bx-lang/issues"
+  },
+  "homepage": "https://github.com/glebbash/bx-lang#readme",
   "dependencies": {},
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
