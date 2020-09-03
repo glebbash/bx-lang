@@ -1,6 +1,6 @@
 {
   "name": "bx-lang",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Blocks programming language interpreter",
   "main": "dist/blocks.js",
   "scripts": {
