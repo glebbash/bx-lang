@@ -1,5 +1,5 @@
 fun factorial1(x)
-    if (x <= 2) { return x }
+    if (x <= 2) return x
     x * factorial1(x - 1)
 
 fun factorial2(x) = if (x <= 2) {
