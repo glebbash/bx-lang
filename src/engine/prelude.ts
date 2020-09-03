@@ -49,6 +49,10 @@ export class BObject extends BWrapper<Record<string, BValue>>("Object") {
     }
 }
 
+export class BBreak extends BWrapper<number>("Break") {}
+
+export class BContinue extends BWrapper<number>("Continue") {}
+
 export class BReturn extends BWrapper<BValue>("Return") {}
 
 export type BFunctionBody = (...args: BValue[]) => BValue
@@ -56,6 +60,10 @@ export type BFunctionBody = (...args: BValue[]) => BValue
 export class BFunction extends BWrapper<BFunctionBody>("Function") {
     call(...args: BValue[]): BValue {
         return this.data(...args)
+    }
+
+    toString() {
+        return "function"
     }
 }
 
@@ -81,9 +89,8 @@ export class BConst extends BValue {
     }
 
     toString() {
-        return this.type
+        return this.type.toLowerCase()
     }
 }
 
 export const VOID = new BConst("Void")
-export const BREAK = new BConst("Break")

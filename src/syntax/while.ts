@@ -1,5 +1,5 @@
 import { Context, subContext } from "../context"
-import { BREAK, BReturn, TRUE, VOID } from "../engine/prelude"
+import { BBreak, BContinue, BReturn, TRUE, VOID } from "../engine/prelude"
 import { Parser } from "../parser"
 import { blockOrExpr } from "./block"
 import { Expression } from "./expression"
@@ -18,8 +18,15 @@ export class WhileExpr implements Expression {
         const loopCtx = subContext(ctx)
         while (this.cond.eval(ctx) === TRUE) {
             const res = this.body.eval(loopCtx)
-            if (res === BREAK) {
+            if (res.is(BBreak)) {
+                if (--res.data !== 0) {
+                    return res
+                }
                 break
+            } else if (res.is(BContinue)) {
+                if (--res.data !== 0) {
+                    return res
+                }
             } else if (res.is(BReturn)) {
                 return res
             }

@@ -1,6 +1,6 @@
 import { Context } from "../context"
 import { BValue } from "../engine/engine"
-import { BReturn, VOID } from "../engine/prelude"
+import { BBreak, BContinue, BReturn, VOID } from "../engine/prelude"
 import { Expr, Token } from "../lexer"
 import { Parser } from "../parser"
 import { Expression } from "./expression"
@@ -36,7 +36,7 @@ export class BlockExpr implements Expression {
         let res: BValue = VOID
         for (const expr of this.body) {
             res = expr.eval(ctx)
-            if (res.is(BReturn)) {
+            if (res.is(BReturn) || res.is(BBreak) || res.is(BContinue)) {
                 return res
             }
         }

@@ -12,7 +12,9 @@ import { Parser } from "./parser"
 import { ARRAY } from "./syntax/array"
 import { assign } from "./syntax/assign"
 import { binaryOp } from "./syntax/binary-op"
+import { BREAK } from "./syntax/break"
 import { call } from "./syntax/call"
+import { CONTINUE } from "./syntax/continue"
 import { define } from "./syntax/define"
 import { doAndAssign } from "./syntax/do-and-assign"
 import { dot } from "./syntax/dot"
@@ -129,11 +131,12 @@ export class BlocksParser extends Parser {
         this.macro("if", IF)
         this.macro("while", WHILE)
         this.macro("for", FOR)
+        this.macro("break", BREAK)
+        this.macro("continue", CONTINUE)
         this.macro("return", RETURN)
         this.macro("fun", FUN)
         this.macro("export", EXPORT)
         this.macro("import", IMPORT)
-        // TODO: break
     }
 
     doAndAssign([name, precedence]: [string, number], fun: BinaryFun) {

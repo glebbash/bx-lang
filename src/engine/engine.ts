@@ -49,7 +49,7 @@ export abstract class BValue {
     as<T extends BValue>(type: Constructor<T>): T {
         return this.is(type)
             ? this
-            : panic(`Cannot cast ${this.type} to ${type.name}`)
+            : panic(`Cannot cast ${this.type} to ${type.name.slice(1)}`)
     }
 
     is<T extends BValue>(type: Constructor<T>): this is T {

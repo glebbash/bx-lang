@@ -1,6 +1,6 @@
 import { Context, subContext } from "../context"
 import { BValue } from "../engine/engine"
-import { BREAK, BReturn, VOID } from "../engine/prelude"
+import { BBreak, BContinue, BReturn, VOID } from "../engine/prelude"
 import { Parser } from "../parser"
 import { panic } from "../utils/panic"
 import { blockOrExpr } from "./block"
@@ -43,8 +43,15 @@ export class ForExpr implements Expression {
         for (const val of iter) {
             forCtx.scope.set(this.name, val)
             const res = this.body.eval(forCtx)
-            if (res === BREAK) {
+            if (res.is(BBreak)) {
+                if (--res.data !== 0) {
+                    return res
+                }
                 break
+            } else if (res.is(BContinue)) {
+                if (--res.data !== 0) {
+                    return res
+                }
             } else if (res.is(BReturn)) {
                 return res
             }
