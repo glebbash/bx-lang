@@ -51,6 +51,10 @@ export class PropExpr extends AssignableExpr {
         super()
     }
 
+    isDefinable() {
+        return false
+    }
+
     assign(ctx: Context, value: BValue): void {
         this.object.eval(ctx).as(BObject).set(this.prop, value)
     }

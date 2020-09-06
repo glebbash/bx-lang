@@ -18,6 +18,10 @@ export class ElementExpr extends AssignableExpr {
         super()
     }
 
+    isDefinable() {
+        return false
+    }
+
     assign(ctx: Context, value: BValue): void {
         const arr = this.arr.eval(ctx).as(BArray).data
         const index = this.index.eval(ctx).as(BNumber).data
