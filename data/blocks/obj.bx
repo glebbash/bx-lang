@@ -9,4 +9,4 @@ const res = Adult({
     ]
 })
 
-print res
+print(res)

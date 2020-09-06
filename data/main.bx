@@ -7,6 +7,6 @@ const data = [
 ]
 
 for [a, b] in data {
-    print a
-    print b
+    print(a)
+    print(b)
 }

@@ -13,6 +13,6 @@ fun factorial3(x)
         x * factorial3(x - 1)
     }
 
-print factorial1(10)
-print factorial2(10)
-print factorial3(10)
+print(factorial1(10))
+print(factorial2(10))
+print(factorial3(10))

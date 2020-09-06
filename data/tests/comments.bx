@@ -10,4 +10,4 @@ comment
         */
     */
 */
-print 2 + 2 // comment
+print(2 + 2) // comment
