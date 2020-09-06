@@ -1,7 +1,7 @@
 import { BlocksParser } from "./blocks-parser"
 import { Core } from "./core"
-import { BValue, Engine } from "./engine/engine"
-import { BArray, BFunction, BString } from "./engine/prelude"
+import { Engine } from "./engine/engine"
+import { BArray, BFunction, BString, VOID } from "./engine/prelude"
 import { Scope } from "./engine/scope"
 import { Lexer } from "./lexer"
 
@@ -29,8 +29,15 @@ export class Blocks extends Core {
                     .data.reduce((acc, val) => fun.call(acc, val), init)
             })
         this.globalScope.define(
+            "print",
+            new BFunction((val) => {
+                console.log(val.toString())
+                return VOID
+            }),
+        )
+        this.globalScope.define(
             "pp",
-            new BFunction((val: BValue) => {
+            new BFunction((val) => {
                 const expr = val.as(BString).data
                 return new BString(this.prettyPrint(expr))
             }),
