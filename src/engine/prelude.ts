@@ -58,12 +58,15 @@ export class BReturn extends BWrapper<BValue>("Return") {}
 export type BFunctionBody = (...args: BValue[]) => BValue
 
 export class BFunction extends BWrapper<BFunctionBody>("Function") {
+    constructor(body: BFunctionBody, private name?: string) {
+        super(body)
+    }
     call(...args: BValue[]): BValue {
         return this.data(...args)
     }
 
     toString() {
-        return "function"
+        return this.name ? `function ${this.name}` : "function"
     }
 }
 

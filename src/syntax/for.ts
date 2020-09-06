@@ -3,32 +3,34 @@ import { BValue } from "../engine/engine"
 import { BBreak, BContinue, BReturn, VOID } from "../engine/prelude"
 import { Parser } from "../parser"
 import { panic } from "../utils/panic"
+import { AssignableExpr, isAssignable } from "./assignable"
 import { blockOrExpr } from "./block"
 import { Expression } from "./expression"
-import { expectIdent } from "./ident"
 import { parenExpr } from "./paren"
 import { PrefixParser } from "./prefix-op"
 
 export const FOR: PrefixParser<ForExpr> = (parser: Parser) => {
-    let name: string
-    let iterable: Expression
-    if (parser.nextIs({ type: "block_paren" })) {
-        const subParser = parser.subParser(parenExpr(parser, parser.next()))
-        name = expectIdent(subParser).name
-        subParser.expect({ value: "in" })
-        iterable = subParser.parseToEnd()
-    } else {
-        name = expectIdent(parser).name
-        parser.expect({ value: "in" })
-        iterable = parser.parse()
+    const condParser = parser.nextIs({ type: "block_paren" })
+        ? parser.subParser(parenExpr(parser, parser.next()))
+        : parser
+    const bindingStartToken = condParser.next(false)
+    const binding = condParser.parse()
+    if (
+        !isAssignable(binding) ||
+        !binding.isDefinable() ||
+        !binding.isValid()
+    ) {
+        return condParser.unexpectedToken(bindingStartToken)
     }
+    condParser.expect({ value: "in" })
+    const iterable = condParser.parse()
     const body = blockOrExpr(parser)
-    return new ForExpr(name, iterable, body)
+    return new ForExpr(binding, iterable, body)
 }
 
 export class ForExpr implements Expression {
     constructor(
-        private name: string,
+        private binding: AssignableExpr,
         private iterable: Expression,
         private body: Expression,
     ) {}
@@ -39,9 +41,9 @@ export class ForExpr implements Expression {
             panic(`${iter} is not iterable`)
         }
         const forCtx = subContext(ctx)
-        forCtx.scope.define(this.name, VOID, false)
+        this.binding.define(forCtx, VOID, false)
         for (const val of iter) {
-            forCtx.scope.set(this.name, val)
+            this.binding.assign(forCtx, val)
             const res = this.body.eval(forCtx)
             if (res.is(BBreak)) {
                 if (--res.data !== 0) {
@@ -60,10 +62,9 @@ export class ForExpr implements Expression {
     }
 
     toString(symbol = "", indent = ""): string {
-        return `for ${this.name} in ${this.iterable} ${this.body.toString(
-            symbol,
-            indent,
-        )}`
+        return `for ${this.binding.toString(symbol, indent)} in ${
+            this.iterable
+        } ${this.body.toString(symbol, indent)}`
     }
 }
 

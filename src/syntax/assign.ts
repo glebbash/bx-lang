@@ -6,7 +6,7 @@ import { postfixParser } from "./postfix-op"
 
 export const assign = (precedence: number) =>
     postfixParser(precedence, (parser: Parser, token, assignable) => {
-        if (!(assignable instanceof AssignableExpr)) {
+        if (!(assignable instanceof AssignableExpr) || !assignable.isValid()) {
             parser.unexpectedToken(token)
         }
         // right associative
@@ -15,8 +15,8 @@ export const assign = (precedence: number) =>
 
 export class AssignExpr implements Expression {
     constructor(
-        private assignable: AssignableExpr,
-        private value: Expression,
+        public assignable: AssignableExpr,
+        public value: Expression,
     ) {}
 
     eval(ctx: Context) {

@@ -1,8 +1,9 @@
 import { Context } from "../context"
 import { BValue } from "../engine/engine"
-import { BObject } from "../engine/prelude"
+import { BObject, VOID } from "../engine/prelude"
 import { Expr, Token } from "../lexer"
 import { Parser } from "../parser"
+import { AssignableExpr } from "./assignable"
 import { Expression } from "./expression"
 import { expectIdent, IdentExpr } from "./ident"
 import { PrefixParser } from "./prefix-op"
@@ -31,8 +32,16 @@ export const OBJECT: PrefixParser<ObjectExpr> = (
     return new ObjectExpr(pairs)
 }
 
-export class ObjectExpr implements Expression {
-    constructor(public pairs: KVPair[]) {}
+export class ObjectExpr extends AssignableExpr {
+    constructor(public pairs: KVPair[]) {
+        super()
+    }
+
+    isValid() {
+        return this.pairs.every(
+            ([_, value]) => value === null || value instanceof IdentExpr,
+        )
+    }
 
     eval(ctx: Context): BValue {
         const data: Record<string, BValue> = {}
@@ -40,6 +49,26 @@ export class ObjectExpr implements Expression {
             data[name] = val?.eval(ctx) ?? new IdentExpr(name).eval(ctx)
         }
         return new BObject(data)
+    }
+
+    define(ctx: Context, value: BValue, constant: boolean): void {
+        if (value === VOID) {
+            for (const [name, value] of this.pairs) {
+                ctx.scope.define(value?.toString() ?? name, VOID, constant)
+            }
+            return
+        }
+        const obj = value.as(BObject).data
+        for (const [name, value] of this.pairs) {
+            ctx.scope.define(value?.toString() ?? name, obj[name], constant)
+        }
+    }
+
+    assign(ctx: Context, value: BValue): void {
+        const obj = value.as(BObject).data
+        for (const [name, value] of this.pairs) {
+            ctx.scope.set(value?.toString() ?? name, obj[name])
+        }
     }
 
     toString(symbol = "", indent = ""): string {

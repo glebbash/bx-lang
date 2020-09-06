@@ -1,1 +1,12 @@
-import tests.continue_break::{}
+import tests.assign::{}
+
+const data = [
+    [1, 2]
+    [3, 4]
+    [5, 6]
+]
+
+for [a, b] in data {
+    print a
+    print b
+}
