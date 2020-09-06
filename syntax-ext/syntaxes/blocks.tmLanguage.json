@@ -79,19 +79,19 @@
 			"patterns": [
 				{
 					"name": "keyword.control.blocks",
-					"match": "\\b(if|while|for|return|fun|in|else|class|export|import)\\b"
+					"match": "(?<!\\.)\\b(if|while|for|return|fun|in|else|class|export|import)\\b"
 				},
 				{
 					"name": "entity.name.function.blocks",
-					"match": "\\b(print)\\b"
+					"match": "(?<!\\.)\\b(print)\\b"
 				},
 				{
 					"name": "storage.type.blocks",
-					"match": "\\b(let|const)\\b"
+					"match": "(?<!\\.)\\b(let|const)\\b"
 				},
 				{
 					"name": "variable.language",
-					"match": "\\b(self)\\b"
+					"match": "(?<!\\.)\\b(self)\\b"
 				}
 			]
 		},
