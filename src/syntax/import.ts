@@ -39,7 +39,11 @@ export class ImportExpr implements Expression {
         ctx.core.eval(file, importCtx)
 
         for (const [name, val] of this.pairs) {
-            ctx.scope.define(val?.toString() ?? name, importCtx.scope.get(name), true)
+            ctx.scope.define(
+                val?.toString() ?? name,
+                importCtx.scope.get(name),
+                true,
+            )
         }
         // TODO: handle varargs import
         return VOID

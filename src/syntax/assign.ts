@@ -14,10 +14,7 @@ export const assign = (precedence: number) =>
     })
 
 export class AssignExpr implements Expression {
-    constructor(
-        public assignable: AssignableExpr,
-        public value: Expression,
-    ) {}
+    constructor(public assignable: AssignableExpr, public value: Expression) {}
 
     eval(ctx: Context) {
         const value = this.value.eval(ctx)
