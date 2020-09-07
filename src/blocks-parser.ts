@@ -1,11 +1,13 @@
 import { BValue } from "./engine/engine"
 import {
     BArray,
+    BBoolean,
     BNumber,
     BObject,
     bool,
     BRange,
     BString,
+    FALSE,
     TRUE,
 } from "./engine/prelude"
 import { Parser } from "./parser"
@@ -27,12 +29,12 @@ import { IDENT } from "./syntax/ident"
 import { IF } from "./syntax/if"
 import { IMPORT } from "./syntax/import"
 import { INDENT } from "./syntax/indent"
-import { LITERAL } from "./syntax/literal"
+import { is } from "./syntax/is"
+import { literal, LITERAL } from "./syntax/literal"
 import { OBJECT } from "./syntax/object"
 import { PAREN } from "./syntax/paren"
 import { PostfixParser } from "./syntax/postfix-op"
 import { PrefixParser } from "./syntax/prefix-op"
-import { PRINT } from "./syntax/print"
 import { RETURN } from "./syntax/return"
 import { unaryOp } from "./syntax/unary-op"
 import { WHILE } from "./syntax/while"
@@ -102,6 +104,12 @@ export class BlocksParser extends Parser {
             prec("..").lessThan("+"),
             (a, b) => new BRange(num(a), num(b)),
         )
+        this.binaryOp(prec("and").lessThan("=="), (a, b) =>
+            bool(a.as(BBoolean).data && b.as(BBoolean).data),
+        )
+        this.binaryOp(prec("or").sameAs("and"), (a, b) =>
+            bool(a.as(BBoolean).data && b.as(BBoolean).data),
+        )
 
         this.postfix.set("<BLOCK_PAREN>", call(prec("<CALL>").moreThan("^")[1]))
         this.postfix.set(
@@ -109,6 +117,8 @@ export class BlocksParser extends Parser {
             element(prec("<ELEM>").sameAs("<CALL>")[1]),
         )
         this.postfix.set("<BLOCK_INDENT>", INDENT)
+
+        this.postfix.set("is", is(prec("is").sameAs("+")[1]))
 
         this.postfix.set(".", dot(prec(".").moreThan("^")[1]))
         this.postfix.set("::", doubleSemi(prec("::").sameAs(".")[1]))
@@ -125,7 +135,8 @@ export class BlocksParser extends Parser {
         this.unaryOp("+", (a) => a)
         this.unaryOp("!", (a) => bool(a !== TRUE))
 
-        this.macro("print", PRINT)
+        this.macro("true", literal(TRUE))
+        this.macro("false", literal(FALSE))
         this.macro("let", define(false))
         this.macro("const", define(true))
         this.macro("if", IF)

@@ -5,6 +5,9 @@ import { Parser } from "../parser"
 import { Expression } from "./expression"
 import { PrefixParser } from "./prefix-op"
 
+export const literal = (value: BValue): PrefixParser<ConstExpr> => () =>
+    new ConstExpr(value)
+
 export const LITERAL: PrefixParser<ConstExpr> = (
     _parser: Parser,
     token: Token,
