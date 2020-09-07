@@ -79,11 +79,7 @@
 			"patterns": [
 				{
 					"name": "keyword.control.blocks",
-					"match": "(?<!\\.)\\b(if|while|for|return|fun|in|else|class|export|import)\\b"
-				},
-				{
-					"name": "entity.name.function.blocks",
-					"match": "(?<!\\.)\\b(print)\\b"
+					"match": "(?<!\\.)\\b(if|else|while|for|fun|return|in|is|class|import|export|and|or)\\b"
 				},
 				{
 					"name": "storage.type.blocks",
@@ -92,6 +88,10 @@
 				{
 					"name": "variable.language",
 					"match": "(?<!\\.)\\b(self)\\b"
+				},
+				{
+					"name": "constant.language",
+					"match": "(?<!\\.)\\b(true|false)\\b"
 				}
 			]
 		},
