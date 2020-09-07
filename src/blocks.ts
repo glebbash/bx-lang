@@ -1,6 +1,6 @@
 import { BlocksParser } from "./blocks-parser"
 import { Core } from "./core"
-import { Engine } from "./engine/engine"
+import { BValue, Engine } from "./engine/engine"
 import { BArray, BFunction, BString, VOID } from "./engine/prelude"
 import { Scope } from "./engine/scope"
 import { Lexer } from "./lexer"
@@ -32,6 +32,16 @@ export class Blocks extends Core {
             "print",
             new BFunction((val) => {
                 console.log(val.toString())
+                return VOID
+            }),
+        )
+        this.globalScope.define(
+            "input",
+            new BFunction((fun: BValue) => {
+                const cb = fun.as(BFunction)
+                process.stdin.once("data", (data) => {
+                    cb.call(new BString(data.toString().slice(0, -1)))
+                })
                 return VOID
             }),
         )
