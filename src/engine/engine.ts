@@ -44,7 +44,7 @@ export class BType {
 }
 
 export abstract class BValue {
-    constructor(public type: string) {}
+    type = this.constructor.name.slice(1)
 
     as<T extends BValue>(type: Constructor<T>): T {
         return this.is(type)
@@ -68,19 +68,17 @@ export abstract class BValue {
     abstract toString(): string
 }
 
-export function BWrapper<T>(type: string) {
-    return class extends BValue {
-        constructor(public data: T) {
-            super(type)
-        }
+export abstract class BWrapper<T> extends BValue {
+    constructor(public data: T) {
+        super()
+    }
 
-        equals(other: BValue) {
-            return other.type === this.type && (other as any).data === this.data
-        }
+    equals(other: BValue) {
+        return other.type === this.type && (other as any).data === this.data
+    }
 
-        toString() {
-            return "" + this.data
-        }
+    toString() {
+        return "" + this.data
     }
 }
 

@@ -1,24 +1,30 @@
 import { panic } from "../utils/panic"
 import { BValue, BWrapper } from "./engine"
 
-export class BBoolean extends BWrapper<boolean>("Boolean") {}
+/////////////////
+
+export class BBoolean extends BWrapper<boolean> {}
 
 export const TRUE = new BBoolean(true)
 export const FALSE = new BBoolean(false)
 
-export function bool(b: boolean): BBoolean {
-    return b ? TRUE : FALSE
-}
+export const bool = (b: boolean) => (b ? TRUE : FALSE)
 
-export class BNumber extends BWrapper<number>("Number") {}
+/////////////////
 
-export class BString extends BWrapper<string>("String") {
+export class BNumber extends BWrapper<number> {}
+
+/////////////////
+
+export class BString extends BWrapper<string> {
     [Symbol.iterator]() {
         return this.data[Symbol.iterator]()
     }
 }
 
-export class BArray extends BWrapper<BValue[]>("Array") {
+/////////////////
+
+export class BArray extends BWrapper<BValue[]> {
     [Symbol.iterator]() {
         return this.data[Symbol.iterator]()
     }
@@ -27,7 +33,9 @@ export class BArray extends BWrapper<BValue[]>("Array") {
     }
 }
 
-export class BObject extends BWrapper<Record<string, BValue>>("Object") {
+/////////////////
+
+export class BObject extends BWrapper<Record<string, BValue>> {
     get(prop: string): BValue {
         return this.data[prop] ?? panic(`Prop ${prop} is not defined`)
     }
@@ -49,15 +57,31 @@ export class BObject extends BWrapper<Record<string, BValue>>("Object") {
     }
 }
 
-export class BBreak extends BWrapper<number>("Break") {}
+/////////////////
 
-export class BContinue extends BWrapper<number>("Continue") {}
+export class BBreak extends BWrapper<number> {}
 
-export class BReturn extends BWrapper<BValue>("Return") {}
+export class BContinue extends BWrapper<number> {}
+
+export class BReturn extends BWrapper<BValue> {}
+
+export class BYield extends BWrapper<BValue> {}
+
+/////////////////
+
+export class BVoid extends BValue {
+    toString() {
+        return "void"
+    }
+}
+
+export const VOID = new BVoid()
+
+/////////////////
 
 export type BFunctionBody = (...args: BValue[]) => BValue
 
-export class BFunction extends BWrapper<BFunctionBody>("Function") {
+export class BFunction extends BWrapper<BFunctionBody> {
     constructor(body: BFunctionBody, private name?: string) {
         super(body)
     }
@@ -70,9 +94,11 @@ export class BFunction extends BWrapper<BFunctionBody>("Function") {
     }
 }
 
+/////////////////
+
 export class BRange extends BValue {
     constructor(private start: number, private stop: number) {
-        super("Range")
+        super()
     }
 
     *[Symbol.iterator]() {
@@ -85,15 +111,3 @@ export class BRange extends BValue {
         return `${this.start}..${this.stop}`
     }
 }
-
-export class BConst extends BValue {
-    constructor(type: string) {
-        super(type)
-    }
-
-    toString() {
-        return this.type.toLowerCase()
-    }
-}
-
-export const VOID = new BConst("Void")
