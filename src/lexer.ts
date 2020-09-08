@@ -3,7 +3,7 @@ import { syntaxError } from "./utils/syntax-error"
 const EOF = null
 type EOF = typeof EOF
 
-export type Expr = Token[]
+export type Tokens = Token[]
 
 // prettier-ignore
 export type TokenType = 
@@ -23,7 +23,7 @@ export type Token = {
     type: TokenType
     start: Position
     end: Position
-    value: string | Expr[]
+    value: string | Tokens[]
 }
 
 export type LexerConfig = {
@@ -72,10 +72,10 @@ export class Lexer {
         this.config = Object.assign({}, DEFAULT_CONFIG, config ?? {})
     }
 
-    tokenize(source: string): Expr[] {
+    tokenize(source: string): Tokens[] {
         this.reset(source)
 
-        const exprs: Expr[] = []
+        const exprs: Tokens[] = []
         while (true) {
             const comments: Token[] = []
             this.skipWhiteSpace(comments)
@@ -88,7 +88,7 @@ export class Lexer {
         return exprs
     }
 
-    *tokenizeIter(source: string): Generator<Expr> {
+    *tokenizeIter(source: string): Generator<Tokens> {
         this.reset(source)
 
         while (true) {
@@ -129,7 +129,7 @@ export class Lexer {
             } else if (this.col > col) {
                 const last = expr[expr.length - 1]
                 if (last.type === "block_indent") {
-                    ;(last.value as Expr[]).push(
+                    ;(last.value as Tokens[]).push(
                         this.exprIndented(this.row, this.col, end),
                     )
                     continue
@@ -186,7 +186,7 @@ export class Lexer {
         type,
     ]: LexerConfig["bracketed"][string]): Token {
         return this.token(type, () => {
-            const exprs: Expr[] = []
+            const exprs: Tokens[] = []
             this.next() // skip opening bracket
             while (true) {
                 const comments: Token[] = []
