@@ -4,5 +4,5 @@ print(obj)
 obj.for = 1
 print(obj.for)
 
-for pair in obj
+for (pair in obj)
     print("{}: {}" % pair)
