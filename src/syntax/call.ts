@@ -1,11 +1,10 @@
 import { Context } from "../context"
 import { BFunction } from "../engine/prelude"
 import { ARRAY, ArrayExpr } from "./array"
-import { Expression } from "./expression"
-import { postfixParser } from "./postfix-op"
+import { action, Expression } from "./core"
 
 export const call = (precedence: number) =>
-    postfixParser(precedence, (parser, token, expr) => {
+    action(precedence, (parser, token, expr) => {
         return new CallExpr(expr, ARRAY(parser, token))
     })
 

@@ -1,4 +1,4 @@
-import { Tokens, Token } from "./lexer"
+import { Token, Tokens } from "./lexer"
 import { stream } from "./utils/stream"
 import { syntaxError } from "./utils/syntax-error"
 
@@ -104,7 +104,10 @@ export class Parser<E> {
 
     getPostfixParser(token: Token): PostfixParser<E>
     getPostfixParser(token: Token, strict: false): PostfixParser<E> | undefined
-    getPostfixParser(token: Token, strict = true): PostfixParser<E> | undefined {
+    getPostfixParser(
+        token: Token,
+        strict = true,
+    ): PostfixParser<E> | undefined {
         const parser = this.postfix.get(this.getTokenType(token))
         if (parser === undefined && strict) {
             syntaxError("Invalid operator: " + token.value, token.start)

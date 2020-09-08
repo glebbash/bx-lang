@@ -1,17 +1,15 @@
 import { Context, subContext } from "../context"
 import { BValue } from "../engine/engine"
 import { BFunction, BReturn, VOID } from "../engine/prelude"
-import { Parser } from "../parser"
 import { panic } from "../utils/panic"
 import { syntaxError } from "../utils/syntax-error"
 import { ARRAY } from "./array"
 import { blockOrExpr } from "./block"
+import { Atom, Expression, ExprParser } from "./core"
 import { ExportableExpr } from "./export"
-import { Expression } from "./expression"
 import { IDENT, IdentExpr } from "./ident"
-import { PrefixParser } from "./prefix-op"
 
-export const FUN: PrefixParser<FunExpr | NamedFunExpr> = (parser: Parser) => {
+export const FUN: Atom<FunExpr | NamedFunExpr> = (parser: ExprParser) => {
     const name = parser.nextIs({ complexType: "<IDENT>" })
         ? IDENT(parser, parser.next()).name
         : null

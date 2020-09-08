@@ -2,11 +2,11 @@ import { Context } from "../context"
 import { BReturn } from "../engine/prelude"
 import { Atom, Expression, ExprParser } from "./core"
 
-export const RETURN: Atom<ReturnExpr> = (parser: ExprParser) => {
-    return new ReturnExpr(parser.parse())
+export const YIELD: Atom<YieldExpr> = (parser: ExprParser) => {
+    return new YieldExpr(parser.parse())
 }
 
-export class ReturnExpr implements Expression {
+export class YieldExpr implements Expression {
     constructor(private value: Expression) {}
 
     eval(ctx: Context) {

@@ -1,29 +1,24 @@
 import { Context } from "../context"
 import { BValue } from "../engine/engine"
 import { BBreak, BContinue, BReturn, VOID } from "../engine/prelude"
-import { Expr, Token } from "../lexer"
-import { Parser } from "../parser"
-import { Expression } from "./expression"
-import { PrefixParser } from "./prefix-op"
+import { Token, Tokens } from "../lexer"
+import { Atom, Expression, ExprParser } from "./core"
 
-export function blockOrExpr(parser: Parser): Expression {
+export function blockOrExpr(parser: ExprParser): Expression {
     return isBlock(parser.next(false)) ? expectBlock(parser) : parser.parse()
 }
 export function isBlock(token: Token): boolean {
     return token.type === "block_brace" || token.type === "block_indent"
 }
 
-export function expectBlock(parser: Parser): BlockExpr {
+export function expectBlock(parser: ExprParser): BlockExpr {
     const token = parser.next()
 
     return isBlock(token) ? BLOCK(parser, token) : parser.unexpectedToken(token)
 }
 
-export const BLOCK: PrefixParser<BlockExpr> = (
-    parser: Parser,
-    token: Token,
-) => {
-    const exprs = token.value as Expr[]
+export const BLOCK: Atom<BlockExpr> = (parser: ExprParser, token: Token) => {
+    const exprs = token.value as Tokens[]
     return new BlockExpr(
         exprs.map((expr) => parser.subParser(expr).parseToEnd()),
     )

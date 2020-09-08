@@ -1,14 +1,13 @@
 import { Context } from "../context"
 import { BinaryFun } from "../utils/binary-fun"
-import { Expression } from "./expression"
-import { postfixParser } from "./postfix-op"
+import { action, Expression } from "./core"
 
 export const binaryOp = (
     precedence: number,
     fun: BinaryFun,
     rightAssoc = false,
 ) =>
-    postfixParser(precedence, (parser, token, expr1) => {
+    action(precedence, (parser, token, expr1) => {
         const expr2 = parser.parse(precedence - (rightAssoc ? 1 : 0))
         return new BinaryOpExpr(token.value as string, expr1, expr2, fun)
     })

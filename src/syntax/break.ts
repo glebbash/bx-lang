@@ -1,9 +1,7 @@
 import { BBreak } from "../engine/prelude"
-import { Parser } from "../parser"
-import { Expression } from "./expression"
-import { PrefixParser } from "./prefix-op"
+import { Atom, Expression, ExprParser } from "./core"
 
-export const BREAK: PrefixParser<BreakExpr> = (parser: Parser) => {
+export const BREAK: Atom<BreakExpr> = (parser: ExprParser) => {
     if (parser.nextIs({ type: "number" })) {
         const token = parser.next()
         const times = Number(token.value)

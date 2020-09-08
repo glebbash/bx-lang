@@ -1,20 +1,15 @@
 import { Context } from "../context"
 import { BValue } from "../engine/engine"
 import { BObject, VOID } from "../engine/prelude"
-import { Expr, Token } from "../lexer"
-import { Parser } from "../parser"
+import { Token, Tokens } from "../lexer"
 import { AssignableExpr } from "./assignable"
-import { Expression } from "./expression"
+import { Atom, Expression, ExprParser } from "./core"
 import { expectIdent, IdentExpr } from "./ident"
-import { PrefixParser } from "./prefix-op"
 
 export type KVPair = [string, Expression | null]
 
-export const OBJECT: PrefixParser<ObjectExpr> = (
-    parser: Parser,
-    token: Token,
-) => {
-    const exprs = token.value as Expr[]
+export const OBJECT: Atom<ObjectExpr> = (parser: ExprParser, token: Token) => {
+    const exprs = token.value as Tokens[]
     const pairs: KVPair[] = []
     for (const expr of exprs) {
         const subParser = parser.subParser(expr)

@@ -1,9 +1,7 @@
 import { Context } from "../context"
 import { VOID } from "../engine/prelude"
-import { Parser } from "../parser"
 import { panic } from "../utils/panic"
-import { Expression } from "./expression"
-import { PrefixParser } from "./prefix-op"
+import { Atom, Expression, ExprParser } from "./core"
 
 export interface ExportableExpr extends Expression {
     export(exports: Set<string>): void
@@ -13,7 +11,7 @@ function isExportable(expr: Expression): expr is ExportableExpr {
     return (expr as any).export !== undefined
 }
 
-export const EXPORT: PrefixParser<ExportExpr> = (parser: Parser) => {
+export const EXPORT: Atom<ExportExpr> = (parser: ExprParser) => {
     const token = parser.next(false)
     const expr = parser.parse()
     if (!isExportable(expr)) {

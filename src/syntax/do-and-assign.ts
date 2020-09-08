@@ -1,14 +1,12 @@
 import { Context } from "../context"
-import { Parser } from "../parser"
 import { BinaryFun } from "../utils/binary-fun"
 import { AssignableExpr } from "./assignable"
-import { Expression } from "./expression"
-import { postfixParser } from "./postfix-op"
+import { action, Expression } from "./core"
 
 export const doAndAssign = (precedence: number, fun: BinaryFun) =>
-    postfixParser(precedence, (parser: Parser, token, assignable) => {
+    action(precedence, (parser, token, assignable) => {
         if (!(assignable instanceof AssignableExpr)) {
-            parser.unexpectedToken(token)
+            return parser.unexpectedToken(token)
         }
         return new DoAndAssignExpr(assignable, parser.parse(precedence), fun)
     })

@@ -1,12 +1,10 @@
 import { Context } from "../context"
 import { BValue } from "../engine/engine"
 import { Token } from "../lexer"
-import { Parser } from "../parser"
-import { Expression } from "./expression"
-import { PrefixParser } from "./prefix-op"
+import { Atom, Expression, ExprParser } from "./core"
 
-export const unaryOp = (fun: (x: BValue) => BValue): PrefixParser => (
-    parser: Parser,
+export const unaryOp = (fun: (x: BValue) => BValue): Atom<UnaryOpExpr> => (
+    parser: ExprParser,
     token: Token,
 ) => {
     const expr = parser.parse()

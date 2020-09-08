@@ -1,13 +1,11 @@
 import { Context } from "../context"
 import { BValue } from "../engine/engine"
-import { Expr, Token } from "../lexer"
-import { Parser } from "../parser"
+import { Token, Tokens } from "../lexer"
 import { syntaxError } from "../utils/syntax-error"
-import { Expression } from "./expression"
-import { PrefixParser } from "./prefix-op"
+import { Atom, Expression, ExprParser } from "./core"
 
-export function parenExpr(parser: Parser, token: Token): Expr {
-    const exprs = token.value as Expr[]
+export function parenExpr(parser: ExprParser, token: Token): Tokens {
+    const exprs = token.value as Tokens[]
     if (exprs.length !== 1) {
         syntaxError("Multiple expressions in parentheses.", token.start)
     }
@@ -17,10 +15,7 @@ export function parenExpr(parser: Parser, token: Token): Expr {
     return exprs[0]
 }
 
-export const PAREN: PrefixParser<ParenExpr> = (
-    parser: Parser,
-    token: Token,
-) => {
+export const PAREN: Atom<ParenExpr> = (parser: ExprParser, token: Token) => {
     const expr = parenExpr(parser, token)
     return new ParenExpr(parser.subParser(expr).parseToEnd())
 }

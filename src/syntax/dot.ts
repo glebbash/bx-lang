@@ -2,28 +2,23 @@ import { Context } from "../context"
 import { BValue } from "../engine/engine"
 import { BObject } from "../engine/prelude"
 import { Token } from "../lexer"
-import { Parser } from "../parser"
 import { ARRAY } from "./array"
 import { AssignableExpr } from "./assignable"
-import { Expression } from "./expression"
+import { action, Expression } from "./core"
 import { expectIdent } from "./ident"
-import { postfixParser } from "./postfix-op"
 
 export const dot = (precedence: number) =>
-    postfixParser(
-        precedence,
-        (parser: Parser, _token: Token, obj: Expression) => {
-            const name = expectIdent(parser, true).name
-            if (parser.nextIs({ type: "block_paren" })) {
-                return new MethodCallExpr(
-                    name,
-                    obj,
-                    ARRAY(parser, parser.next()).items,
-                )
-            }
-            return new PropExpr(name, obj)
-        },
-    )
+    action(precedence, (parser, _token: Token, obj: Expression) => {
+        const name = expectIdent(parser, true).name
+        if (parser.nextIs({ type: "block_paren" })) {
+            return new MethodCallExpr(
+                name,
+                obj,
+                ARRAY(parser, parser.next()).items,
+            )
+        }
+        return new PropExpr(name, obj)
+    })
 
 export class MethodCallExpr implements Expression {
     constructor(

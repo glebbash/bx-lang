@@ -1,13 +1,11 @@
 import { Context } from "../context"
-import { Parser } from "../parser"
 import { AssignableExpr } from "./assignable"
-import { Expression } from "./expression"
-import { postfixParser } from "./postfix-op"
+import { action, Expression } from "./core"
 
 export const assign = (precedence: number) =>
-    postfixParser(precedence, (parser: Parser, token, assignable) => {
+    action(precedence, (parser, token, assignable) => {
         if (!(assignable instanceof AssignableExpr) || !assignable.isValid()) {
-            parser.unexpectedToken(token)
+            return parser.unexpectedToken(token)
         }
         // right associative
         return new AssignExpr(assignable, parser.parse(precedence - 1))

@@ -1,11 +1,11 @@
-import { Expr } from "../lexer"
+import { Tokens } from "../lexer"
 import { panic } from "../utils/panic"
-import { postfixParser } from "./postfix-op"
+import { action } from "./core"
 
-export const INDENT = postfixParser(
+export const INDENT = action(
     (parser) => {
         const token = parser.next(false)
-        const sub = parser.getPostfixParser((token.value[0] as Expr)[0])
+        const sub = parser.getPostfixParser((token.value[0] as Tokens)[0])
         if (typeof sub.precedence !== "number") {
             panic("Something's wrong, I can feel it!")
         }
@@ -13,7 +13,7 @@ export const INDENT = postfixParser(
     },
     (parser, token, expr) => {
         const sub = parser.subParser(
-            ([] as Expr).concat(...(token.value as Expr[])),
+            ([] as Tokens).concat(...(token.value as Tokens[])),
         )
         while (0 < sub.tokenPrecedence()) {
             const token = sub.next()

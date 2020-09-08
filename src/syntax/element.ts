@@ -1,15 +1,14 @@
 import { Context } from "../context"
 import { BValue } from "../engine/engine"
 import { BArray, BNumber } from "../engine/prelude"
-import { Expr } from "../lexer"
+import { Tokens } from "../lexer"
 import { panic } from "../utils/panic"
 import { AssignableExpr } from "./assignable"
-import { Expression } from "./expression"
-import { postfixParser } from "./postfix-op"
+import { action, Expression } from "./core"
 
 export const element = (precedence: number) =>
-    postfixParser(precedence, (parser, token, expr) => {
-        const subParser = parser.subParser(token.value[0] as Expr)
+    action(precedence, (parser, token, expr) => {
+        const subParser = parser.subParser(token.value[0] as Tokens)
         return new ElementExpr(expr, subParser.parseToEnd())
     })
 

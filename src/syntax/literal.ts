@@ -1,17 +1,12 @@
 import { BValue } from "../engine/engine"
 import { BNumber, BString } from "../engine/prelude"
 import { Token } from "../lexer"
-import { Parser } from "../parser"
-import { Expression } from "./expression"
-import { PrefixParser } from "./prefix-op"
+import { Atom, Expression, ExprParser } from "./core"
 
-export const literal = (value: BValue): PrefixParser<ConstExpr> => () =>
+export const literal = (value: BValue): Atom<ConstExpr> => () =>
     new ConstExpr(value)
 
-export const LITERAL: PrefixParser<ConstExpr> = (
-    _parser: Parser,
-    token: Token,
-) =>
+export const LITERAL: Atom<ConstExpr> = (_parser: ExprParser, token: Token) =>
     new ConstExpr(
         token.type === "string"
             ? new BString(token.value.slice(1, -1) as string)

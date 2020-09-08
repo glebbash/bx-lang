@@ -1,13 +1,11 @@
 import { Context } from "../context"
 import { VOID } from "../engine/prelude"
-import { Parser } from "../parser"
 import { panic } from "../utils/panic"
 import { AssignExpr } from "./assign"
-import { Expression } from "./expression"
-import { PrefixParser } from "./prefix-op"
+import { Atom, Expression, ExprParser } from "./core"
 
-export const define = (constant: boolean): PrefixParser<DefineExpr> => (
-    parser: Parser,
+export const define = (constant: boolean): Atom<DefineExpr> => (
+    parser: ExprParser,
 ) => {
     const expr = parser.parse()
     if (!(expr instanceof AssignExpr) || !expr.assignable.isDefinable()) {

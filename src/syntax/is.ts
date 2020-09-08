@@ -1,19 +1,14 @@
 import { Context } from "../context"
 import { bool } from "../engine/prelude"
 import { Token } from "../lexer"
-import { Parser } from "../parser"
-import { Expression } from "./expression"
+import { action, Expression } from "./core"
 import { expectIdent } from "./ident"
-import { postfixParser } from "./postfix-op"
 
 export const is = (precedence: number) =>
-    postfixParser(
-        precedence,
-        (parser: Parser, _token: Token, val: Expression) => {
-            const type = expectIdent(parser, true).name
-            return new IsExpr(val, type)
-        },
-    )
+    action(precedence, (parser, _token: Token, val: Expression) => {
+        const type = expectIdent(parser, true).name
+        return new IsExpr(val, type)
+    })
 
 export class IsExpr implements Expression {
     constructor(private val: Expression, private type: string) {}

@@ -1,19 +1,14 @@
 import { Context } from "../context"
 import { BValue } from "../engine/engine"
 import { BArray, VOID } from "../engine/prelude"
-import { Expr, Token } from "../lexer"
-import { Parser } from "../parser"
+import { Token, Tokens } from "../lexer"
 import { panic } from "../utils/panic"
 import { AssignableExpr } from "./assignable"
-import { Expression } from "./expression"
+import { Atom, Expression, ExprParser } from "./core"
 import { IdentExpr } from "./ident"
-import { PrefixParser } from "./prefix-op"
 
-export const ARRAY: PrefixParser<ArrayExpr> = (
-    parser: Parser,
-    token: Token,
-) => {
-    const exprs = token.value as Expr[]
+export const ARRAY: Atom<ArrayExpr> = (parser: ExprParser, token: Token) => {
+    const exprs = token.value as Tokens[]
     const items: Expression[] = []
     for (const expr of exprs) {
         const subParser = parser.subParser(expr)

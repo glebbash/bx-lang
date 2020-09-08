@@ -1,11 +1,9 @@
 import { Context, subContext } from "../context"
 import { BBreak, BContinue, BReturn, TRUE, VOID } from "../engine/prelude"
-import { Parser } from "../parser"
 import { blockOrExpr } from "./block"
-import { Expression } from "./expression"
-import { PrefixParser } from "./prefix-op"
+import { Atom, Expression, ExprParser } from "./core"
 
-export const WHILE: PrefixParser<WhileExpr> = (parser: Parser) => {
+export const WHILE: Atom<WhileExpr> = (parser: ExprParser) => {
     const cond = parser.parse()
     const body = blockOrExpr(parser)
     return new WhileExpr(cond, body)

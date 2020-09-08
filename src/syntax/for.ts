@@ -1,15 +1,13 @@
 import { Context, subContext } from "../context"
 import { BValue } from "../engine/engine"
 import { BBreak, BContinue, BReturn, VOID } from "../engine/prelude"
-import { Parser } from "../parser"
 import { panic } from "../utils/panic"
 import { AssignableExpr, isAssignable } from "./assignable"
 import { blockOrExpr } from "./block"
-import { Expression } from "./expression"
+import { Atom, Expression, ExprParser } from "./core"
 import { parenExpr } from "./paren"
-import { PrefixParser } from "./prefix-op"
 
-export const FOR: PrefixParser<ForExpr> = (parser: Parser) => {
+export const FOR: Atom<ForExpr> = (parser: ExprParser) => {
     const condParser = parser.nextIs({ type: "block_paren" })
         ? parser.subParser(parenExpr(parser, parser.next()))
         : parser

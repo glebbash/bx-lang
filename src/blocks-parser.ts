@@ -17,6 +17,7 @@ import { binaryOp } from "./syntax/binary-op"
 import { BREAK } from "./syntax/break"
 import { call } from "./syntax/call"
 import { CONTINUE } from "./syntax/continue"
+import { Action, Atom, Expression } from "./syntax/core"
 import { define } from "./syntax/define"
 import { doAndAssign } from "./syntax/do-and-assign"
 import { dot } from "./syntax/dot"
@@ -33,8 +34,6 @@ import { is } from "./syntax/is"
 import { literal, LITERAL } from "./syntax/literal"
 import { OBJECT } from "./syntax/object"
 import { PAREN } from "./syntax/paren"
-import { PostfixParser } from "./syntax/postfix-op"
-import { PrefixParser } from "./syntax/prefix-op"
 import { RETURN } from "./syntax/return"
 import { unaryOp } from "./syntax/unary-op"
 import { WHILE } from "./syntax/while"
@@ -74,17 +73,17 @@ const MOD: BinaryFun = (a, b) => {
 }
 const POW: BinaryFun = (a, b) => new BNumber(num(a) ** num(b))
 
-export class BlocksParser extends Parser {
+export class BlocksParser extends Parser<Expression> {
     constructor() {
         super(
-            new Map<string, PrefixParser>()
+            new Map<string, Atom<Expression>>()
                 .set("<IDENT>", IDENT)
                 .set("<NUMBER>", LITERAL)
                 .set("<STRING>", LITERAL)
                 .set("<BLOCK_PAREN>", PAREN)
                 .set("<BLOCK_BRACKET>", ARRAY)
                 .set("<BLOCK_BRACE>", OBJECT),
-            new Map<string, PostfixParser>(),
+            new Map<string, Action<Expression>>(),
         )
         const prec = precedence()
 
@@ -175,7 +174,7 @@ export class BlocksParser extends Parser {
         this.prefix.set(value, unaryOp(fun))
     }
 
-    macro(value: string, parser: PrefixParser) {
+    macro(value: string, parser: Atom<Expression>) {
         if (this.prefix.has(value)) {
             panic(`Cannot redefine macro '${value}'`)
         }

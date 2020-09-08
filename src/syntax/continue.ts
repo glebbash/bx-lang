@@ -1,9 +1,7 @@
 import { BContinue } from "../engine/prelude"
-import { Parser } from "../parser"
-import { Expression } from "./expression"
-import { PrefixParser } from "./prefix-op"
+import { Atom, Expression, ExprParser } from "./core"
 
-export const CONTINUE: PrefixParser<ContinueExpr> = (parser: Parser) => {
+export const CONTINUE: Atom<ContinueExpr> = (parser: ExprParser) => {
     if (parser.nextIs({ type: "number" })) {
         const token = parser.next()
         const times = Number(token.value)

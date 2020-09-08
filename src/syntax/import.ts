@@ -1,13 +1,11 @@
 import { readFileSync } from "fs"
 import { Context, subContext } from "../context"
 import { VOID } from "../engine/prelude"
-import { Parser } from "../parser"
-import { Expression } from "./expression"
+import { Atom, Expression, ExprParser } from "./core"
 import { expectIdent } from "./ident"
 import { KVPair, OBJECT } from "./object"
-import { PrefixParser } from "./prefix-op"
 
-export const IMPORT: PrefixParser<ImportExpr> = (parser: Parser) => {
+export const IMPORT: Atom<ImportExpr> = (parser: ExprParser) => {
     let path = ""
     while (true) {
         path += parser.expect({ type: "identifier" }).value as string

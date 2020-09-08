@@ -1,7 +1,7 @@
 import { Context } from "../context"
 import { BValue } from "../engine/engine"
 import { panic } from "../utils/panic"
-import { Expression } from "./expression"
+import { Expression } from "./core"
 
 export function isAssignable(expr: Expression): expr is AssignableExpr {
     return (expr as any).assign !== undefined

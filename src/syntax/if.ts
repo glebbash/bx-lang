@@ -1,11 +1,9 @@
 import { Context, subContext } from "../context"
 import { TRUE, VOID } from "../engine/prelude"
-import { Parser } from "../parser"
 import { blockOrExpr } from "./block"
-import { Expression } from "./expression"
-import { PrefixParser } from "./prefix-op"
+import { Atom, Expression, ExprParser } from "./core"
 
-export const IF: PrefixParser<IfExpr> = (parser: Parser) => {
+export const IF: Atom<IfExpr> = (parser: ExprParser) => {
     const cond = parser.parse()
     const ifTrue = blockOrExpr(parser)
     if (parser.nextIs({ value: "else" })) {

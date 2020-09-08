@@ -1,27 +1,22 @@
 import { Context } from "../context"
 import { BFunction, BObject } from "../engine/prelude"
 import { Token } from "../lexer"
-import { Parser } from "../parser"
 import { ARRAY } from "./array"
-import { Expression } from "./expression"
+import { action, Expression } from "./core"
 import { expectIdent } from "./ident"
-import { postfixParser } from "./postfix-op"
 
 export const doubleSemi = (precedence: number) =>
-    postfixParser(
-        precedence,
-        (parser: Parser, _token: Token, obj: Expression) => {
-            const name = expectIdent(parser, true).name
-            if (parser.nextIs({ type: "block_paren" })) {
-                return new PropCallExpr(
-                    name,
-                    obj,
-                    ARRAY(parser, parser.next()).items,
-                )
-            }
-            return new MethodGetExpr(name, obj)
-        },
-    )
+    action(precedence, (parser, _token: Token, obj: Expression) => {
+        const name = expectIdent(parser, true).name
+        if (parser.nextIs({ type: "block_paren" })) {
+            return new PropCallExpr(
+                name,
+                obj,
+                ARRAY(parser, parser.next()).items,
+            )
+        }
+        return new MethodGetExpr(name, obj)
+    })
 
 export class PropCallExpr implements Expression {
     constructor(
