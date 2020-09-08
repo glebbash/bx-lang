@@ -1,14 +1,17 @@
 import { BlocksParser } from "./blocks-parser"
-import { Core } from "./core"
+import { Context } from "./context"
 import { BValue, Engine } from "./engine/engine"
 import { BArray, BFunction, BString, VOID } from "./engine/prelude"
 import { Scope } from "./engine/scope"
 import { Lexer } from "./lexer"
 
-export class Blocks extends Core {
-    constructor() {
-        super(new Lexer(), new BlocksParser(), new Engine(), new Scope())
+export class Blocks {
+    lexer = new Lexer()
+    parser = new BlocksParser()
+    engine = new Engine()
+    globalScope = new Scope()
 
+    constructor() {
         this.engine.addType("Boolean")
         this.engine.addType("Number")
         this.engine.addType("String")
@@ -53,5 +56,21 @@ export class Blocks extends Core {
             }),
             true,
         )
+    }
+
+    eval(source: string, ctx?: Context) {
+        const tokens = this.lexer.tokenize(source)
+        const exprs = this.parser.parseAll(tokens)
+        const context: Context = ctx ?? {
+            scope: new Scope(this.globalScope),
+            core: this,
+        }
+        return exprs.map((expr) => expr.eval(context)).slice(-1)[0]
+    }
+
+    prettyPrint(source: string): string {
+        const tokens = this.lexer.tokenize(source)
+        const exprs = this.parser.parseAll(tokens)
+        return exprs.map((expr) => expr.toString()).join("\n")
     }
 }
