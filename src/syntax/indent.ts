@@ -1,6 +1,6 @@
+import { action } from "../core"
 import { Tokens } from "../lexer"
 import { panic } from "../utils/panic"
-import { action } from "./core"
 
 export const INDENT = action(
     (parser) => {

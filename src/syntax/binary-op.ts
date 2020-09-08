@@ -1,6 +1,5 @@
-import { Context } from "../context"
+import { action, Context, Expression } from "../core"
 import { BinaryFun } from "../utils/binary-fun"
-import { action, Expression } from "./core"
 
 export const binaryOp = (
     precedence: number,

@@ -1,6 +1,5 @@
-import { Context } from "../context"
+import { Atom, Context, Expression, ExprParser } from "../core"
 import { BReturn } from "../engine/prelude"
-import { Atom, Expression, ExprParser } from "./core"
 
 export const RETURN: Atom<ReturnExpr> = (parser: ExprParser) => {
     return new ReturnExpr(parser.parse())

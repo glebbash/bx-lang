@@ -1,7 +1,6 @@
-import { Context } from "../context"
+import { Atom, Context, Expression, ExprParser } from "../core"
 import { VOID } from "../engine/prelude"
 import { panic } from "../utils/panic"
-import { Atom, Expression, ExprParser } from "./core"
 
 export interface ExportableExpr extends Expression {
     export(exports: Set<string>): void

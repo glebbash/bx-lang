@@ -1,7 +1,6 @@
-import { Context } from "../context"
+import { action, Context, Expression } from "../core"
 import { BFunction } from "../engine/prelude"
 import { ARRAY, ArrayExpr } from "./array"
-import { action, Expression } from "./core"
 
 export const call = (precedence: number) =>
     action(precedence, (parser, token, expr) => {

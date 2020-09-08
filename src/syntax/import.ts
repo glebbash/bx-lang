@@ -1,7 +1,6 @@
 import { readFileSync } from "fs"
-import { Context, subContext } from "../context"
+import { Atom, Context, Expression, ExprParser, subContext } from "../core"
 import { VOID } from "../engine/prelude"
-import { Atom, Expression, ExprParser } from "./core"
 import { expectIdent } from "./ident"
 import { KVPair, OBJECT } from "./object"
 

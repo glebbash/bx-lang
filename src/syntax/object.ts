@@ -1,9 +1,8 @@
-import { Context } from "../context"
+import { Atom, Context, Expression, ExprParser } from "../core"
 import { BValue } from "../engine/engine"
 import { BObject, VOID } from "../engine/prelude"
 import { Token, Tokens } from "../lexer"
 import { AssignableExpr } from "./assignable"
-import { Atom, Expression, ExprParser } from "./core"
 import { expectIdent, IdentExpr } from "./ident"
 
 export type KVPair = [string, Expression | null]

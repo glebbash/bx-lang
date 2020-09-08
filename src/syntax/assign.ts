@@ -1,6 +1,5 @@
-import { Context } from "../context"
+import { action, Context, Expression } from "../core"
 import { AssignableExpr } from "./assignable"
-import { action, Expression } from "./core"
 
 export const assign = (precedence: number) =>
     action(precedence, (parser, token, assignable) => {

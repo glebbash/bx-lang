@@ -1,8 +1,7 @@
-import { Context } from "../context"
+import { action, Context, Expression } from "../core"
 import { BFunction, BObject } from "../engine/prelude"
 import { Token } from "../lexer"
 import { ARRAY } from "./array"
-import { action, Expression } from "./core"
 import { expectIdent } from "./ident"
 
 export const doubleSemi = (precedence: number) =>

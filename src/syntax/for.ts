@@ -1,10 +1,9 @@
-import { Context, subContext } from "../context"
+import { Atom, Context, Expression, ExprParser, subContext } from "../core"
 import { BValue } from "../engine/engine"
 import { BBreak, BContinue, BReturn, VOID } from "../engine/prelude"
 import { panic } from "../utils/panic"
 import { AssignableExpr, isAssignable } from "./assignable"
 import { blockOrExpr } from "./block"
-import { Atom, Expression, ExprParser } from "./core"
 import { parenExpr } from "./paren"
 
 export const FOR: Atom<ForExpr> = (parser: ExprParser) => {

@@ -1,9 +1,8 @@
-import { Context } from "../context"
+import { Atom, Context, ExprParser } from "../core"
 import { BValue } from "../engine/engine"
 import { Token } from "../lexer"
 import { panic } from "../utils/panic"
 import { AssignableExpr } from "./assignable"
-import { Atom, ExprParser } from "./core"
 import { ExportableExpr } from "./export"
 
 export function expectIdent(

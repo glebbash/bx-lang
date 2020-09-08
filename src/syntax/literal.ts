@@ -1,7 +1,7 @@
+import { Atom, Expression, ExprParser } from "../core"
 import { BValue } from "../engine/engine"
 import { BNumber, BString } from "../engine/prelude"
 import { Token } from "../lexer"
-import { Atom, Expression, ExprParser } from "./core"
 
 export const literal = (value: BValue): Atom<ConstExpr> => () =>
     new ConstExpr(value)

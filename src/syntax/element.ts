@@ -1,10 +1,9 @@
-import { Context } from "../context"
+import { action, Context, Expression } from "../core"
 import { BValue } from "../engine/engine"
 import { BArray, BNumber } from "../engine/prelude"
 import { Tokens } from "../lexer"
 import { panic } from "../utils/panic"
 import { AssignableExpr } from "./assignable"
-import { action, Expression } from "./core"
 
 export const element = (precedence: number) =>
     action(precedence, (parser, token, expr) => {

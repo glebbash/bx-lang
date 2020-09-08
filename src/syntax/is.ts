@@ -1,7 +1,6 @@
-import { Context } from "../context"
+import { action, Context, Expression } from "../core"
 import { bool } from "../engine/prelude"
 import { Token } from "../lexer"
-import { action, Expression } from "./core"
 import { expectIdent } from "./ident"
 
 export const is = (precedence: number) =>

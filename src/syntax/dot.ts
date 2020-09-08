@@ -1,10 +1,9 @@
-import { Context } from "../context"
+import { action, Context, Expression } from "../core"
 import { BValue } from "../engine/engine"
 import { BObject } from "../engine/prelude"
 import { Token } from "../lexer"
 import { ARRAY } from "./array"
 import { AssignableExpr } from "./assignable"
-import { action, Expression } from "./core"
 import { expectIdent } from "./ident"
 
 export const dot = (precedence: number) =>

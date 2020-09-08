@@ -1,7 +1,6 @@
-import { Context } from "../context"
+import { action, Context, Expression } from "../core"
 import { BinaryFun } from "../utils/binary-fun"
 import { AssignableExpr } from "./assignable"
-import { action, Expression } from "./core"
 
 export const doAndAssign = (precedence: number, fun: BinaryFun) =>
     action(precedence, (parser, token, assignable) => {

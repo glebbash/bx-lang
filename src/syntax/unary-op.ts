@@ -1,7 +1,6 @@
-import { Context } from "../context"
+import { Atom, Context, Expression, ExprParser } from "../core"
 import { BValue } from "../engine/engine"
 import { Token } from "../lexer"
-import { Atom, Expression, ExprParser } from "./core"
 
 export const unaryOp = (fun: (x: BValue) => BValue): Atom<UnaryOpExpr> => (
     parser: ExprParser,

@@ -1,8 +1,7 @@
-import { Context } from "../context"
+import { Atom, Context, Expression, ExprParser } from "../core"
 import { BValue } from "../engine/engine"
 import { BBreak, BContinue, BReturn, VOID } from "../engine/prelude"
 import { Token, Tokens } from "../lexer"
-import { Atom, Expression, ExprParser } from "./core"
 
 export function blockOrExpr(parser: ExprParser): Expression {
     return isBlock(parser.next(false)) ? expectBlock(parser) : parser.parse()

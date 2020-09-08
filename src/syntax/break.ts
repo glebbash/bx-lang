@@ -1,5 +1,5 @@
+import { Atom, Expression, ExprParser } from "../core"
 import { BBreak } from "../engine/prelude"
-import { Atom, Expression, ExprParser } from "./core"
 
 export const BREAK: Atom<BreakExpr> = (parser: ExprParser) => {
     if (parser.nextIs({ type: "number" })) {

@@ -1,5 +1,5 @@
+import { Atom, Expression, ExprParser } from "../core"
 import { BContinue } from "../engine/prelude"
-import { Atom, Expression, ExprParser } from "./core"
 
 export const CONTINUE: Atom<ContinueExpr> = (parser: ExprParser) => {
     if (parser.nextIs({ type: "number" })) {

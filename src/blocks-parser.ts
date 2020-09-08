@@ -1,3 +1,4 @@
+import { Action, Atom, Expression } from "./core"
 import { BValue } from "./engine/engine"
 import {
     BArray,
@@ -8,7 +9,7 @@ import {
     BRange,
     BString,
     FALSE,
-    TRUE,
+    TRUE
 } from "./engine/prelude"
 import { Parser } from "./parser"
 import { ARRAY } from "./syntax/array"
@@ -17,7 +18,6 @@ import { binaryOp } from "./syntax/binary-op"
 import { BREAK } from "./syntax/break"
 import { call } from "./syntax/call"
 import { CONTINUE } from "./syntax/continue"
-import { Action, Atom, Expression } from "./syntax/core"
 import { define } from "./syntax/define"
 import { doAndAssign } from "./syntax/do-and-assign"
 import { dot } from "./syntax/dot"

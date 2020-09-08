@@ -1,8 +1,7 @@
-import { Context } from "../context"
+import { Atom, Context, Expression, ExprParser } from "../core"
 import { BValue } from "../engine/engine"
 import { Token, Tokens } from "../lexer"
 import { syntaxError } from "../utils/syntax-error"
-import { Atom, Expression, ExprParser } from "./core"
 
 export function parenExpr(parser: ExprParser, token: Token): Tokens {
     const exprs = token.value as Tokens[]

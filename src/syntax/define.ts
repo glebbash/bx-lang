@@ -1,8 +1,7 @@
-import { Context } from "../context"
+import { Atom, Context, Expression, ExprParser } from "../core"
 import { VOID } from "../engine/prelude"
 import { panic } from "../utils/panic"
 import { AssignExpr } from "./assign"
-import { Atom, Expression, ExprParser } from "./core"
 
 export const define = (constant: boolean): Atom<DefineExpr> => (
     parser: ExprParser,

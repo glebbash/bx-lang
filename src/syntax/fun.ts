@@ -1,11 +1,10 @@
-import { Context, subContext } from "../context"
+import { Atom, Context, Expression, ExprParser, subContext } from "../core"
 import { BValue } from "../engine/engine"
 import { BFunction, BReturn, VOID } from "../engine/prelude"
 import { panic } from "../utils/panic"
 import { syntaxError } from "../utils/syntax-error"
 import { ARRAY } from "./array"
 import { blockOrExpr } from "./block"
-import { Atom, Expression, ExprParser } from "./core"
 import { ExportableExpr } from "./export"
 import { IDENT, IdentExpr } from "./ident"
 

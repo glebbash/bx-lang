@@ -1,10 +1,9 @@
-import { Context } from "../context"
+import { Atom, Context, Expression, ExprParser } from "../core"
 import { BValue } from "../engine/engine"
 import { BArray, VOID } from "../engine/prelude"
 import { Token, Tokens } from "../lexer"
 import { panic } from "../utils/panic"
 import { AssignableExpr } from "./assignable"
-import { Atom, Expression, ExprParser } from "./core"
 import { IdentExpr } from "./ident"
 
 export const ARRAY: Atom<ArrayExpr> = (parser: ExprParser, token: Token) => {

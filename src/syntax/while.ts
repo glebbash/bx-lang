@@ -1,7 +1,6 @@
-import { Context, subContext } from "../context"
+import { Atom, Context, Expression, ExprParser, subContext } from "../core"
 import { BBreak, BContinue, BReturn, TRUE, VOID } from "../engine/prelude"
 import { blockOrExpr } from "./block"
-import { Atom, Expression, ExprParser } from "./core"
 
 export const WHILE: Atom<WhileExpr> = (parser: ExprParser) => {
     const cond = parser.parse()
