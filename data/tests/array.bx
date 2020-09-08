@@ -4,6 +4,6 @@ print(arr[3])
 print(arr.map(fun(x) x * 2))
 print(arr.fold(0, fun(a, b) a + b))
 
-for (e in arr) print e
+for (e in arr) print(e)
 arr[0] = "hello"
 print(arr)
