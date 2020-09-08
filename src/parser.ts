@@ -14,10 +14,10 @@ type TokenCondition = {
     complexType?: string
 }
 
-export type PrefixParser<E> = (
+export type PrefixParser<E, T extends E = E> = (
     parser: Parser<E>,
     token: Token,
-) => E
+) => T
 
 export interface PostfixParser<E, T extends E = E> {
     precedence: number | ((parser: Parser<E>) => number)
