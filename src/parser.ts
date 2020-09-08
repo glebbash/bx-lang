@@ -1,7 +1,4 @@
-import { Expr, Token } from "./lexer"
-import { Expression } from "./syntax/expression"
-import { PostfixParser } from "./syntax/postfix-op"
-import { PrefixParser } from "./syntax/prefix-op"
+import { Tokens, Token } from "./lexer"
 import { stream } from "./utils/stream"
 import { syntaxError } from "./utils/syntax-error"
 
@@ -17,27 +14,46 @@ type TokenCondition = {
     complexType?: string
 }
 
-export class Parser {
+export type PrefixParser<E> = (
+    parser: Parser<E>,
+    token: Token,
+) => E
+
+export interface PostfixParser<E, T extends E = E> {
+    precedence: number | ((parser: Parser<E>) => number)
+
+    (parser: Parser<E>, token: Token, expr: E): T
+}
+
+export function postfixParser<E, T extends E>(
+    precedence: PostfixParser<E>["precedence"],
+    fun: (parser: Parser<E>, token: Token, expr: E) => T,
+): PostfixParser<E, T> {
+    ;(fun as any).precedence = precedence
+    return fun as any
+}
+
+export class Parser<E> {
     private prevToken = START_TOKEN
 
     constructor(
-        public prefix: Map<string, PrefixParser>,
-        public postfix: Map<string, PostfixParser>,
+        public prefix: Map<string, PrefixParser<E>>,
+        public postfix: Map<string, PostfixParser<E>>,
         public nextToken: TokenStream = null as any,
     ) {}
 
-    subParser(expr: Expr): Parser {
+    subParser(expr: Tokens): Parser<E> {
         return new Parser(this.prefix, this.postfix, stream(expr))
     }
 
-    parseAll(exprs: Expr[]): Expression[] {
+    parseAll(exprs: Tokens[]): E[] {
         return exprs.map((expr) => {
             this.nextToken = stream(expr)
             return this.parseToEnd()
         })
     }
 
-    parse(precedence = 0): Expression {
+    parse(precedence = 0): E {
         const token = this.next()
         let expr = this.getPrefixParser(token)(this, token)
 
@@ -49,7 +65,7 @@ export class Parser {
         return expr
     }
 
-    parseToEnd(precedence = 0): Expression {
+    parseToEnd(precedence = 0): E {
         const expr = this.parse(precedence)
         this.checkTrailing()
         return expr
@@ -76,9 +92,9 @@ export class Parser {
         return parser.precedence
     }
 
-    getPrefixParser(token: Token): PrefixParser
-    getPrefixParser(token: Token, strict: false): PrefixParser | undefined
-    getPrefixParser(token: Token, strict = true): PrefixParser | undefined {
+    getPrefixParser(token: Token): PrefixParser<E>
+    getPrefixParser(token: Token, strict: false): PrefixParser<E> | undefined
+    getPrefixParser(token: Token, strict = true): PrefixParser<E> | undefined {
         const parser = this.prefix.get(this.getTokenType(token))
         if (parser === undefined && strict) {
             syntaxError("Invalid prefix operator: " + token.value, token.start)
@@ -86,9 +102,9 @@ export class Parser {
         return parser
     }
 
-    getPostfixParser(token: Token): PostfixParser
-    getPostfixParser(token: Token, strict: false): PostfixParser | undefined
-    getPostfixParser(token: Token, strict = true): PostfixParser | undefined {
+    getPostfixParser(token: Token): PostfixParser<E>
+    getPostfixParser(token: Token, strict: false): PostfixParser<E> | undefined
+    getPostfixParser(token: Token, strict = true): PostfixParser<E> | undefined {
         const parser = this.postfix.get(this.getTokenType(token))
         if (parser === undefined && strict) {
             syntaxError("Invalid operator: " + token.value, token.start)
