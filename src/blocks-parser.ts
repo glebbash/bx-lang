@@ -37,6 +37,7 @@ import { PAREN } from "./syntax/paren"
 import { RETURN } from "./syntax/return"
 import { unaryOp } from "./syntax/unary-op"
 import { WHILE } from "./syntax/while"
+import { YIELD } from "./syntax/yield"
 import { BinaryFun } from "./utils/binary-fun"
 import { format, formatN } from "./utils/format"
 import { panic } from "./utils/panic"
@@ -144,6 +145,7 @@ export class BlocksParser extends Parser<Expression> {
         this.macro("break", BREAK)
         this.macro("continue", CONTINUE)
         this.macro("return", RETURN)
+        this.macro("yield", YIELD)
         this.macro("fun", FUN)
         this.macro("export", EXPORT)
         this.macro("import", IMPORT)
