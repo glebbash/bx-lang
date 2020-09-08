@@ -1,11 +1,12 @@
 import { Context } from "../context"
 import { BValue } from "../engine/engine"
-import { BObject } from "../engine/prelude"
+import { BObject, VOID } from "../engine/prelude"
 import { Token } from "../lexer"
 import { Parser } from "../parser"
 import { ARRAY } from "./array"
 import { AssignableExpr } from "./assignable"
-import { Expression } from "./expression"
+import { seq } from "./block"
+import { Callback, Expression } from "./expression"
 import { expectIdent } from "./ident"
 import { postfixParser } from "./postfix-op"
 
@@ -32,11 +33,23 @@ export class MethodCallExpr implements Expression {
         private args: Expression[],
     ) {}
 
-    eval(ctx: Context) {
-        const args = this.args.map((arg) => arg.eval(ctx))
-        return this.object
-            .eval(ctx)
-            .invoke(ctx.core.engine, this.method, ...args)
+    eval(ctx: Context, cb: Callback) {
+        const args: BValue[] = []
+        seq(
+            ctx,
+            this.args,
+            (val, err, next) => {
+                if (err) return cb(VOID, err)
+                args.push(val)
+                next()
+            },
+            () => {
+                this.object.eval(ctx, (obj, err) => {
+                    if (err) return cb(VOID, err)
+                    obj.invoke(ctx.core.engine, this.method, cb, ...args)
+                })
+            },
+        )
     }
 
     toString(symbol = "", indent = ""): string {
@@ -55,12 +68,19 @@ export class PropExpr extends AssignableExpr {
         return false
     }
 
-    assign(ctx: Context, value: BValue): void {
-        this.object.eval(ctx).as(BObject).set(this.prop, value)
+    assign(ctx: Context, value: BValue, cb: (error?: Error) => void): void {
+        this.object.eval(ctx, (obj, err) => {
+            if (err) return cb(err)
+            obj.as(BObject).set(this.prop, value)
+            cb()
+        })
     }
 
-    eval(ctx: Context) {
-        return this.object.eval(ctx).as(BObject).get(this.prop)
+    eval(ctx: Context, cb: Callback) {
+        this.object.eval(ctx, (res, err) => {
+            if (err) return cb(VOID, err)
+            cb(res.as(BObject).get(this.prop))
+        })
     }
 
     toString(symbol = "", indent = ""): string {

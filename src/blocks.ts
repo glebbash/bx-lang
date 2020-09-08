@@ -18,38 +18,65 @@ export class Blocks extends Core {
 
         this.engine
             .expectType("Array")
-            .addMethod("map", (arr, funV) => {
+            .addMethod("map", (arr, cb, funV) => {
                 const fun = funV.as(BFunction)
-                return new BArray(arr.as(BArray).data.map((e) => fun.call(e)))
+                const orig = arr.as(BArray).data
+                const res: BValue[] = []
+                let i = 0
+                const next = () => {
+                    if (i >= orig.length) {
+                        return cb(new BArray(res))
+                    }
+                    const item = orig[i]
+                    fun.call((val, err) => {
+                        if (err) return cb(VOID, err)
+                        res.push(val)
+                        next()
+                    }, item)
+                }
+                next()
             })
-            .addMethod("fold", (arr, init, funV) => {
+            .addMethod("fold", (arrV, cb, init, funV) => {
                 const fun = funV.as(BFunction)
-                return arr
-                    .as(BArray)
-                    .data.reduce((acc, val) => fun.call(acc, val), init)
+                const arr = arrV.as(BArray).data
+                let res = init
+                let i = 0
+                const next = () => {
+                    if (i >= arr.length) {
+                        return cb(res)
+                    }
+                    const item = arr[i]
+                    fun.call((val, err) => {
+                        if (err) return cb(VOID, err)
+                        res = val
+                        next()
+                    }, res, item)
+                }
+                next()
             })
         this.globalScope.define(
             "print",
-            new BFunction((val) => {
+            new BFunction((cb, val) => {
                 console.log(val.toString())
-                return VOID
+                cb(VOID)
             }),
         )
         this.globalScope.define(
             "input",
-            new BFunction((fun: BValue) => {
-                const cb = fun.as(BFunction)
+            new BFunction((cb, message?: BValue) => {
+                if (message) {
+                    process.stdout.write(message.as(BString).data)
+                }
                 process.stdin.once("data", (data) => {
-                    cb.call(new BString(data.toString().slice(0, -1)))
+                    cb(new BString(data.toString().slice(0, -1)))
                 })
-                return VOID
             }),
         )
         this.globalScope.define(
             "pp",
-            new BFunction((val) => {
+            new BFunction((cb, val) => {
                 const expr = val.as(BString).data
-                return new BString(this.prettyPrint(expr))
+                cb(new BString(this.prettyPrint(expr)))
             }),
             true,
         )

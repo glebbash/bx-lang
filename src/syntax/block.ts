@@ -3,7 +3,7 @@ import { BValue } from "../engine/engine"
 import { BBreak, BContinue, BReturn, VOID } from "../engine/prelude"
 import { Expr, Token } from "../lexer"
 import { Parser } from "../parser"
-import { Expression } from "./expression"
+import { Callback, Expression } from "./expression"
 import { PrefixParser } from "./prefix-op"
 
 export function blockOrExpr(parser: Parser): Expression {
@@ -29,18 +29,43 @@ export const BLOCK: PrefixParser<BlockExpr> = (
     )
 }
 
+export function seq(
+    ctx: Context,
+    arr: Expression[],
+    cycle: (value: BValue, err: Error | undefined, next: () => void) => void,
+    ret: (full: boolean) => any,
+) {
+    let i = 0
+    const next = () => {
+        if (i >= arr.length) {
+            return ret(true)
+        }
+        arr[i].eval(ctx, (val, err) => {
+            i++
+            cycle(val, err, next)
+        })
+    }
+    next()
+}
+
 export class BlockExpr implements Expression {
     constructor(private body: Expression[]) {}
 
-    eval(ctx: Context) {
+    eval(ctx: Context, cb: Callback) {
         let res: BValue = VOID
-        for (const expr of this.body) {
-            res = expr.eval(ctx)
-            if (res.is(BReturn) || res.is(BBreak) || res.is(BContinue)) {
-                return res
-            }
-        }
-        return res
+        seq(
+            ctx,
+            this.body,
+            (val, err, next) => {
+                if (err) return cb(VOID, err)
+                res = val
+                if (res.is(BReturn) || res.is(BBreak) || res.is(BContinue)) {
+                    return cb(res)
+                }
+                next()
+            },
+            () => cb(res),
+        )
     }
 
     toString(symbol = "", indent = ""): string {

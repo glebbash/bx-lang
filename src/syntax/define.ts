@@ -3,7 +3,7 @@ import { VOID } from "../engine/prelude"
 import { Parser } from "../parser"
 import { panic } from "../utils/panic"
 import { AssignExpr } from "./assign"
-import { Expression } from "./expression"
+import { Callback, Expression } from "./expression"
 import { PrefixParser } from "./prefix-op"
 
 export const define = (constant: boolean): PrefixParser<DefineExpr> => (
@@ -19,10 +19,13 @@ export const define = (constant: boolean): PrefixParser<DefineExpr> => (
 export class DefineExpr implements Expression {
     constructor(private expr: AssignExpr, private constant: boolean) {}
 
-    eval(ctx: Context) {
+    eval(ctx: Context, cb: Callback) {
         const { assignable, value } = this.expr
-        assignable.define(ctx, value.eval(ctx), this.constant)
-        return VOID
+        value.eval(ctx, (res, err) => {
+            if (err) return cb(VOID, err)
+            assignable.define(ctx, res, this.constant)
+            cb(VOID)
+        })
     }
 
     toString(symbol = "", indent = ""): string {

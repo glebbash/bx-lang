@@ -2,10 +2,9 @@ import { Context, subContext } from "../context"
 import { BValue } from "../engine/engine"
 import { BBreak, BContinue, BReturn, VOID } from "../engine/prelude"
 import { Parser } from "../parser"
-import { panic } from "../utils/panic"
 import { AssignableExpr, isAssignable } from "./assignable"
 import { blockOrExpr } from "./block"
-import { Expression } from "./expression"
+import { Callback, Expression } from "./expression"
 import { parenExpr } from "./paren"
 import { PrefixParser } from "./prefix-op"
 
@@ -35,30 +34,42 @@ export class ForExpr implements Expression {
         private body: Expression,
     ) {}
 
-    eval(ctx: Context) {
-        const iter = this.iterable.eval(ctx)
-        if (!isIterable(iter)) {
-            panic(`${iter} is not iterable`)
-        }
-        const forCtx = subContext(ctx)
-        this.binding.define(forCtx, VOID, false)
-        for (const val of iter) {
-            this.binding.assign(forCtx, val)
-            const res = this.body.eval(forCtx)
-            if (res.is(BBreak)) {
-                if (--res.data !== 0) {
-                    return res
-                }
-                break
-            } else if (res.is(BContinue)) {
-                if (--res.data !== 0) {
-                    return res
-                }
-            } else if (res.is(BReturn)) {
-                return res
+    eval(ctx: Context, cb: Callback) {
+        this.iterable.eval(ctx, (iter, err) => {
+            if (err) return cb(VOID, err)
+            if (!isIterable(iter)) {
+                return cb(VOID, new Error(`${iter} is not iterable`))
             }
-        }
-        return VOID
+            const forCtx = subContext(ctx)
+            this.binding.define(forCtx, VOID, false)
+            const iterator: Iterator<BValue> = iter[Symbol.iterator]()
+            const next = () => {
+                const { done, value } = iterator.next()
+                if (done) {
+                    return cb(VOID)
+                }
+                this.binding.assign(forCtx, value, (err) => {
+                    if (err) return cb(VOID, err)
+                    this.body.eval(ctx, (res, err) => {
+                        if (err) return cb(VOID, err)
+                        if (res.is(BBreak)) {
+                            if (--res.data !== 0) {
+                                return res
+                            }
+                            return cb(VOID)
+                        } else if (res.is(BContinue)) {
+                            if (--res.data !== 0) {
+                                return res
+                            }
+                        } else if (res.is(BReturn)) {
+                            return res
+                        }
+                        next()
+                    })
+                })
+            }
+            next()
+        })
     }
 
     toString(symbol = "", indent = ""): string {

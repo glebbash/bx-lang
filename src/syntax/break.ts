@@ -1,6 +1,7 @@
+import { Context } from "../context"
 import { BBreak } from "../engine/prelude"
 import { Parser } from "../parser"
-import { Expression } from "./expression"
+import { Callback, Expression } from "./expression"
 import { PrefixParser } from "./prefix-op"
 
 export const BREAK: PrefixParser<BreakExpr> = (parser: Parser) => {
@@ -18,8 +19,8 @@ export const BREAK: PrefixParser<BreakExpr> = (parser: Parser) => {
 export class BreakExpr implements Expression {
     constructor(private times: number) {}
 
-    eval() {
-        return new BBreak(this.times)
+    eval(_ctx: Context, cb: Callback) {
+        cb(new BBreak(this.times))
     }
 
     toString(): string {

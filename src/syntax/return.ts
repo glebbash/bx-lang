@@ -1,7 +1,7 @@
 import { Context } from "../context"
-import { BReturn } from "../engine/prelude"
+import { VOID } from "../engine/prelude"
 import { Parser } from "../parser"
-import { Expression } from "./expression"
+import { Callback, Expression } from "./expression"
 import { PrefixParser } from "./prefix-op"
 
 export const RETURN: PrefixParser<ReturnExpr> = (parser: Parser) => {
@@ -11,8 +11,11 @@ export const RETURN: PrefixParser<ReturnExpr> = (parser: Parser) => {
 export class ReturnExpr implements Expression {
     constructor(private value: Expression) {}
 
-    eval(ctx: Context) {
-        return new BReturn(this.value.eval(ctx))
+    eval(ctx: Context, cb: Callback) {
+        this.value.eval(ctx, (res, err) => {
+            if (err) return cb(VOID, err)
+            cb(VOID, err)
+        })
     }
 
     toString(symbol = "", indent = ""): string {

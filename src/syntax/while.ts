@@ -2,7 +2,7 @@ import { Context, subContext } from "../context"
 import { BBreak, BContinue, BReturn, TRUE, VOID } from "../engine/prelude"
 import { Parser } from "../parser"
 import { blockOrExpr } from "./block"
-import { Expression } from "./expression"
+import { Callback, Expression } from "./expression"
 import { PrefixParser } from "./prefix-op"
 
 export const WHILE: PrefixParser<WhileExpr> = (parser: Parser) => {
@@ -14,24 +14,33 @@ export const WHILE: PrefixParser<WhileExpr> = (parser: Parser) => {
 export class WhileExpr implements Expression {
     constructor(private cond: Expression, private body: Expression) {}
 
-    eval(ctx: Context) {
+    eval(ctx: Context, cb: Callback) {
         const loopCtx = subContext(ctx)
-        while (this.cond.eval(ctx) === TRUE) {
-            const res = this.body.eval(loopCtx)
-            if (res.is(BBreak)) {
-                if (--res.data !== 0) {
-                    return res
+        const next = () => {
+            this.cond.eval(ctx, (cond, err) => {
+                if (err) return cb(VOID, err)
+                if (cond !== TRUE) {
+                    return cb(VOID)
                 }
-                break
-            } else if (res.is(BContinue)) {
-                if (--res.data !== 0) {
-                    return res
-                }
-            } else if (res.is(BReturn)) {
-                return res
-            }
+                this.body.eval(loopCtx, (res, err) => {
+                    if (err) return cb(VOID, err)
+                    if (res.is(BBreak)) {
+                        if (--res.data !== 0) {
+                            return cb(res)
+                        }
+                        return cb(VOID)
+                    } else if (res.is(BContinue)) {
+                        if (--res.data !== 0) {
+                            return cb(res)
+                        }
+                    } else if (res.is(BReturn)) {
+                        return cb(res)
+                    }
+                    next()
+                })
+            })
         }
-        return VOID
+        next()
     }
 
     toString(symbol = "", indent = ""): string {

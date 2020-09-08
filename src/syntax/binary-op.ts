@@ -1,6 +1,7 @@
 import { Context } from "../context"
+import { VOID } from "../engine/prelude"
 import { BinaryFun } from "../utils/binary-fun"
-import { Expression } from "./expression"
+import { Callback, Expression } from "./expression"
 import { postfixParser } from "./postfix-op"
 
 export const binaryOp = (
@@ -21,9 +22,14 @@ export class BinaryOpExpr implements Expression {
         private fun: BinaryFun,
     ) {}
 
-    eval(ctx: Context) {
-        const value = this.fun(this.expr1.eval(ctx), this.expr2.eval(ctx))
-        return value
+    eval(ctx: Context, cb: Callback) {
+        this.expr1.eval(ctx, (val1, err) => {
+            if (err) return cb(VOID, err)
+            this.expr2.eval(ctx, (val2, err) => {
+                if (err) return cb(VOID, err)
+                return cb(this.fun(val1, val2))
+            })
+        })
     }
 
     toString(_symbol = "", indent = ""): string {

@@ -1,8 +1,9 @@
+import { Context } from "../context"
 import { BValue } from "../engine/engine"
 import { BNumber, BString } from "../engine/prelude"
 import { Token } from "../lexer"
 import { Parser } from "../parser"
-import { Expression } from "./expression"
+import { Callback, Expression } from "./expression"
 import { PrefixParser } from "./prefix-op"
 
 export const literal = (value: BValue): PrefixParser<ConstExpr> => () =>
@@ -21,8 +22,8 @@ export const LITERAL: PrefixParser<ConstExpr> = (
 export class ConstExpr implements Expression {
     constructor(private value: BValue) {}
 
-    eval() {
-        return this.value
+    eval(_ctx: Context, cb: Callback) {
+        cb(this.value)
     }
 
     toString(): string {

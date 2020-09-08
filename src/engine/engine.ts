@@ -1,7 +1,8 @@
+import { Callback } from "../syntax/expression"
 import { AutoMap } from "../utils/auto-map"
 import { panic } from "../utils/panic"
 
-export type BMethod = (self: BValue, ...args: BValue[]) => BValue
+export type BMethod = (self: BValue, cb: Callback, ...args: BValue[]) => void
 export type BMethodBound = (...args: BValue[]) => BValue
 export type Constructor<T> = { new (...args: any): T }
 
@@ -56,9 +57,9 @@ export abstract class BValue {
         return this.constructor === type
     }
 
-    invoke(engine: Engine, methodName: string, ...args: BValue[]): BValue {
+    invoke(engine: Engine, methodName: string, cb: Callback, ...args: BValue[]) {
         const method = engine.expectType(this.type).expectMethod(methodName)
-        return method(this, ...args)
+        method(this, cb, ...args)
     }
 
     equals(other: BValue) {
@@ -128,16 +129,4 @@ export function Class<T extends BType, F extends Function>(
             return true
         },
     })
-}
-
-export function caller(engine: Engine) {
-    return <T extends BValue>(obj: T): T & { [key: string]: BMethodBound } => {
-        return new Proxy(obj, {
-            get: (target, prop: string) => {
-                if (prop in target) return (target as any)[prop]
-                const method = engine.expectType(target.type).expectMethod(prop)
-                return (...args: BValue[]) => method(target, ...args)
-            },
-        }) as any
-    }
 }

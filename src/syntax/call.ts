@@ -1,7 +1,9 @@
 import { Context } from "../context"
-import { BFunction } from "../engine/prelude"
+import { BValue } from "../engine/engine"
+import { BFunction, VOID } from "../engine/prelude"
 import { ARRAY, ArrayExpr } from "./array"
-import { Expression } from "./expression"
+import { seq } from "./block"
+import { Callback, Expression } from "./expression"
 import { postfixParser } from "./postfix-op"
 
 export const call = (precedence: number) =>
@@ -12,11 +14,24 @@ export const call = (precedence: number) =>
 export class CallExpr implements Expression {
     constructor(private fun: Expression, private args: ArrayExpr) {}
 
-    eval(ctx: Context) {
-        const fun = this.fun.eval(ctx).as(BFunction)
-        const args = this.args.items.map((arg) => arg.eval(ctx))
-        const value = fun.call(...args)
-        return value
+    eval(ctx: Context, cb: Callback) {
+        this.fun.eval(ctx, (f, err) => {
+            if (err) return cb(VOID, err)
+            const fun = f.as(BFunction)
+            const args: BValue[] = []
+            seq(
+                ctx,
+                this.args.items,
+                (val, err, next) => {
+                    if (err) return cb(VOID, err)
+                    args.push(val)
+                    next()
+                },
+                () => {
+                    fun.call(cb, ...args)
+                },
+            )
+        })
     }
 
     toString(symbol = "", indent = ""): string {

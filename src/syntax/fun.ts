@@ -7,7 +7,7 @@ import { syntaxError } from "../utils/syntax-error"
 import { ARRAY } from "./array"
 import { blockOrExpr } from "./block"
 import { ExportableExpr } from "./export"
-import { Expression } from "./expression"
+import { Callback, Expression } from "./expression"
 import { IDENT, IdentExpr } from "./ident"
 import { PrefixParser } from "./prefix-op"
 
@@ -38,15 +38,17 @@ function makeFunction(
     body: Expression,
     name?: string,
 ) {
-    return new BFunction((...args: BValue[]) => {
+    return new BFunction((cb: Callback, ...args: BValue[]) => {
         const funCtx = subContext(ctx)
         for (let i = 0; i < params.length; i++) {
             if (i < args.length) {
                 funCtx.scope.define(params[i], args[i])
             }
         }
-        const res = body.eval(funCtx)
-        return res.is(BReturn) ? res.data : res
+        body.eval(funCtx, (res, err) => {
+            if (err) return cb(VOID, err)
+            cb(res.is(BReturn) ? res.data : res)
+        })
     }, name)
 }
 
@@ -64,10 +66,10 @@ export class NamedFunExpr implements Expression, ExportableExpr {
         exports!.add(this.name)
     }
 
-    eval(ctx: Context) {
+    eval(ctx: Context, cb: Callback) {
         const fun = makeFunction(ctx, this.params, this.body, this.name)
         ctx.scope.define(this.name, fun)
-        return VOID
+        cb(fun)
     }
 
     toString(symbol = "", indent = ""): string {
@@ -80,8 +82,8 @@ export class NamedFunExpr implements Expression, ExportableExpr {
 export class FunExpr implements Expression {
     constructor(private params: string[], private body: Expression) {}
 
-    eval(ctx: Context) {
-        return makeFunction(ctx, this.params, this.body)
+    eval(ctx: Context, cb: Callback) {
+        cb(makeFunction(ctx, this.params, this.body))
     }
 
     toString(symbol = "", indent = ""): string {

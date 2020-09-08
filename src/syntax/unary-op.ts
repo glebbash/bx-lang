@@ -1,8 +1,9 @@
 import { Context } from "../context"
 import { BValue } from "../engine/engine"
+import { VOID } from "../engine/prelude"
 import { Token } from "../lexer"
 import { Parser } from "../parser"
-import { Expression } from "./expression"
+import { Callback, Expression } from "./expression"
 import { PrefixParser } from "./prefix-op"
 
 export const unaryOp = (fun: (x: BValue) => BValue): PrefixParser => (
@@ -20,8 +21,11 @@ export class UnaryOpExpr implements Expression {
         private fun: (x: BValue) => BValue,
     ) {}
 
-    eval(ctx: Context) {
-        return this.fun(this.expr.eval(ctx))
+    eval(ctx: Context, cb: Callback) {
+        this.expr.eval(ctx, (val, err) => {
+            if (err) return cb(VOID, err)
+            cb(this.fun(val))
+        })
     }
 
     toString(symbol = "", indent = ""): string {

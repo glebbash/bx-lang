@@ -1,9 +1,10 @@
 import { Context } from "../context"
 import { BValue } from "../engine/engine"
+import { VOID } from "../engine/prelude"
 import { Expr, Token } from "../lexer"
 import { Parser } from "../parser"
 import { syntaxError } from "../utils/syntax-error"
-import { Expression } from "./expression"
+import { Callback, Expression } from "./expression"
 import { PrefixParser } from "./prefix-op"
 
 export function parenExpr(parser: Parser, token: Token): Expr {
@@ -28,8 +29,8 @@ export const PAREN: PrefixParser<ParenExpr> = (
 export class ParenExpr implements Expression {
     constructor(public expr: Expression) {}
 
-    eval(ctx: Context): BValue {
-        return this.expr.eval(ctx)
+    eval(ctx: Context, cb: Callback) {
+        this.expr.eval(ctx, cb)
     }
 
     toString(symbol = "", indent = ""): string {

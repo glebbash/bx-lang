@@ -1,9 +1,11 @@
 import { Context } from "../context"
-import { BFunction, BObject } from "../engine/prelude"
+import { BValue } from "../engine/engine"
+import { BFunction, BObject, VOID } from "../engine/prelude"
 import { Token } from "../lexer"
 import { Parser } from "../parser"
 import { ARRAY } from "./array"
-import { Expression } from "./expression"
+import { seq } from "./block"
+import { Callback, Expression } from "./expression"
 import { expectIdent } from "./ident"
 import { postfixParser } from "./postfix-op"
 
@@ -30,14 +32,25 @@ export class PropCallExpr implements Expression {
         private args: Expression[],
     ) {}
 
-    eval(ctx: Context) {
-        const args = this.args.map((arg) => arg.eval(ctx))
-        return this.object
-            .eval(ctx)
-            .as(BObject)
-            .get(this.name)
-            .as(BFunction)
-            .call(...args)
+    eval(ctx: Context, cb: Callback) {
+        this.object.eval(ctx, (objV, err) => {
+            if (err) return cb(VOID, err)
+            const obj = objV.as(BObject)
+            const fun = obj.get(this.name).as(BFunction)
+            const args: BValue[] = []
+            seq(
+                ctx,
+                this.args,
+                (val, err, next) => {
+                    if (err) return cb(VOID, err)
+                    args.push(val)
+                    next()
+                },
+                () => {
+                    fun.call(cb, ...args)
+                },
+            )
+        })
     }
 
     toString(symbol = "", indent = ""): string {
@@ -50,8 +63,11 @@ export class PropCallExpr implements Expression {
 export class MethodGetExpr implements Expression {
     constructor(private prop: string, private object: Expression) {}
 
-    eval(ctx: Context) {
-        return this.object.eval(ctx).as(BObject).get(this.prop)
+    eval(ctx: Context, cb: Callback) {
+        this.object.eval(ctx, (res, err) => {
+            if (err) return cb(VOID, err)
+            cb(res.as(BObject).get(this.prop))
+        })
     }
 
     toString(symbol = "", indent = ""): string {

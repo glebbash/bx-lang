@@ -4,7 +4,8 @@ import { BObject, VOID } from "../engine/prelude"
 import { Expr, Token } from "../lexer"
 import { Parser } from "../parser"
 import { AssignableExpr } from "./assignable"
-import { Expression } from "./expression"
+import { seq } from "./block"
+import { Callback, Expression } from "./expression"
 import { expectIdent, IdentExpr } from "./ident"
 import { PrefixParser } from "./prefix-op"
 
@@ -43,12 +44,25 @@ export class ObjectExpr extends AssignableExpr {
         )
     }
 
-    eval(ctx: Context): BValue {
+    eval(ctx: Context, cb: Callback) {
         const data: Record<string, BValue> = {}
-        for (const [name, val] of this.pairs) {
-            data[name] = val?.eval(ctx) ?? new IdentExpr(name).eval(ctx)
-        }
-        return new BObject(data)
+        const actions = this.pairs.map(
+            ([name, val]) => val ?? new IdentExpr(name),
+        )
+        const keys = this.pairs.map((pair) => pair[0])
+        let i = 0
+        seq(
+            ctx,
+            actions,
+            (val, err, next) => {
+                if (err) return cb(VOID, err)
+                data[keys[i++]] = val
+                next()
+            },
+            () => {
+                cb(new BObject(data))
+            },
+        )
     }
 
     define(ctx: Context, value: BValue, constant: boolean): void {

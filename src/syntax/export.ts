@@ -2,7 +2,7 @@ import { Context } from "../context"
 import { VOID } from "../engine/prelude"
 import { Parser } from "../parser"
 import { panic } from "../utils/panic"
-import { Expression } from "./expression"
+import { Callback, Expression } from "./expression"
 import { PrefixParser } from "./prefix-op"
 
 export interface ExportableExpr extends Expression {
@@ -25,13 +25,15 @@ export const EXPORT: PrefixParser<ExportExpr> = (parser: Parser) => {
 export class ExportExpr implements Expression {
     constructor(private expr: ExportableExpr) {}
 
-    eval(ctx: Context) {
-        this.expr.eval(ctx)
-        if (ctx.scope.exports === null) {
-            panic("Cannot export values from here")
-        }
-        this.expr.export(ctx.scope.exports)
-        return VOID
+    eval(ctx: Context, cb: Callback) {
+        this.expr.eval(ctx, (_, err) => {
+            if (err) return cb(VOID, err)
+            if (ctx.scope.exports === null) {
+                return cb(VOID, new Error("Cannot export values from here"))
+            }
+            this.expr.export(ctx.scope.exports)
+            cb(VOID)
+        })
     }
 
     toString(symbol = "", indent = ""): string {

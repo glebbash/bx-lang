@@ -5,7 +5,8 @@ import { Expr, Token } from "../lexer"
 import { Parser } from "../parser"
 import { panic } from "../utils/panic"
 import { AssignableExpr } from "./assignable"
-import { Expression } from "./expression"
+import { seq } from "./block"
+import { Callback, Expression } from "./expression"
 import { IdentExpr } from "./ident"
 import { PrefixParser } from "./prefix-op"
 
@@ -77,8 +78,18 @@ export class ArrayExpr extends AssignableExpr {
         // }
     }
 
-    eval(ctx: Context): BValue {
-        return new BArray(this.items.map((item) => item.eval(ctx)))
+    eval(ctx: Context, cb: Callback) {
+        const arr: BValue[] = []
+        seq(
+            ctx,
+            this.items,
+            (val, err, next) => {
+                if (err) return cb(VOID, err)
+                arr.push(val)
+                next()
+            },
+            () => cb(new BArray(arr)),
+        )
     }
 
     toString(symbol = "", indent = ""): string {

@@ -5,6 +5,7 @@ import { Parser } from "../parser"
 import { panic } from "../utils/panic"
 import { AssignableExpr } from "./assignable"
 import { ExportableExpr } from "./export"
+import { Callback } from "./expression"
 import { PrefixParser } from "./prefix-op"
 
 export function expectIdent(parser: Parser, includeSpecial = false): IdentExpr {
@@ -33,12 +34,13 @@ export class IdentExpr extends AssignableExpr implements ExportableExpr {
         ctx.scope.define(this.name, value, constant)
     }
 
-    assign(ctx: Context, value: BValue): void {
+    assign(ctx: Context, value: BValue, cb: (err?: Error) => void): void {
         ctx.scope.set(this.name, value)
+        cb()
     }
 
-    eval(ctx: Context) {
-        return ctx.scope.get(this.name)
+    eval(ctx: Context, cb: Callback) {
+        cb(ctx.scope.get(this.name))
     }
 
     toString() {

@@ -1,3 +1,4 @@
+import { Callback } from "../syntax/expression"
 import { panic } from "../utils/panic"
 import { BValue, BWrapper } from "./engine"
 
@@ -55,14 +56,15 @@ export class BContinue extends BWrapper<number>("Continue") {}
 
 export class BReturn extends BWrapper<BValue>("Return") {}
 
-export type BFunctionBody = (...args: BValue[]) => BValue
+export type BFunctionBody = (cb: Callback, ...args: BValue[]) => void
 
 export class BFunction extends BWrapper<BFunctionBody>("Function") {
     constructor(body: BFunctionBody, private name?: string) {
         super(body)
     }
-    call(...args: BValue[]): BValue {
-        return this.data(...args)
+
+    call(cb: Callback, ...args: BValue[]) {
+        this.data(cb, ...args)
     }
 
     toString() {

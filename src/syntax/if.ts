@@ -2,7 +2,7 @@ import { Context, subContext } from "../context"
 import { TRUE, VOID } from "../engine/prelude"
 import { Parser } from "../parser"
 import { blockOrExpr } from "./block"
-import { Expression } from "./expression"
+import { Callback, Expression } from "./expression"
 import { PrefixParser } from "./prefix-op"
 
 export const IF: PrefixParser<IfExpr> = (parser: Parser) => {
@@ -23,13 +23,17 @@ export class IfExpr implements Expression {
         private ifFalse?: Expression,
     ) {}
 
-    eval(ctx: Context) {
-        if (this.cond.eval(ctx) === TRUE) {
-            return this.ifTrue.eval(subContext(ctx))
-        } else if (this.ifFalse !== undefined) {
-            return this.ifFalse.eval(subContext(ctx))
-        }
-        return VOID
+    eval(ctx: Context, cb: Callback) {
+        this.cond.eval(ctx, (cond, err) => {
+            if (err) return cb(VOID, err)
+            if (cond === TRUE) {
+                return this.ifTrue.eval(subContext(ctx), cb)
+            } else if (this.ifFalse) {
+                return this.ifFalse.eval(subContext(ctx), cb)
+            } else {
+                return cb(VOID)
+            }
+        })
     }
 
     toString(symbol = "", indent = ""): string {

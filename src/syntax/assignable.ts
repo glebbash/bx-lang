@@ -1,7 +1,7 @@
 import { Context } from "../context"
 import { BValue } from "../engine/engine"
 import { panic } from "../utils/panic"
-import { Expression } from "./expression"
+import { Callback, Expression } from "./expression"
 
 export function isAssignable(expr: Expression): expr is AssignableExpr {
     return (expr as any).assign !== undefined
@@ -20,9 +20,13 @@ export abstract class AssignableExpr implements Expression {
         panic("This expression is not definable")
     }
 
-    abstract eval(ctx: Context): BValue
+    abstract eval(ctx: Context, cb: Callback): void
 
-    abstract assign(ctx: Context, value: BValue): void
+    abstract assign(
+        ctx: Context,
+        value: BValue,
+        cb: (err?: Error) => void,
+    ): void
 
     abstract toString(symbol?: string, indent?: string): string
 }

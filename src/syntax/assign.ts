@@ -1,7 +1,8 @@
 import { Context } from "../context"
+import { VOID } from "../engine/prelude"
 import { Parser } from "../parser"
 import { AssignableExpr } from "./assignable"
-import { Expression } from "./expression"
+import { Callback, Expression } from "./expression"
 import { postfixParser } from "./postfix-op"
 
 export const assign = (precedence: number) =>
@@ -16,10 +17,14 @@ export const assign = (precedence: number) =>
 export class AssignExpr implements Expression {
     constructor(public assignable: AssignableExpr, public value: Expression) {}
 
-    eval(ctx: Context) {
-        const value = this.value.eval(ctx)
-        this.assignable.assign(ctx, value)
-        return value
+    eval(ctx: Context, cb: Callback) {
+        this.value.eval(ctx, (value, err) => {
+            if (err) return cb(VOID, err)
+            this.assignable.assign(ctx, value, (err) => {
+                if (err) return cb(VOID, err)
+                cb(value)
+            })
+        })
     }
 
     toString(symbol = "", indent = ""): string {

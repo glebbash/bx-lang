@@ -1,10 +1,10 @@
 import { Context } from "../context"
 import { BValue } from "../engine/engine"
-import { BArray, BNumber } from "../engine/prelude"
+import { BArray, BNumber, VOID } from "../engine/prelude"
 import { Expr } from "../lexer"
 import { panic } from "../utils/panic"
 import { AssignableExpr } from "./assignable"
-import { Expression } from "./expression"
+import { Callback, Expression } from "./expression"
 import { postfixParser } from "./postfix-op"
 
 export const element = (precedence: number) =>
@@ -22,27 +22,40 @@ export class ElementExpr extends AssignableExpr {
         return false
     }
 
-    assign(ctx: Context, value: BValue): void {
-        const arr = this.arr.eval(ctx).as(BArray).data
-        const index = this.index.eval(ctx).as(BNumber).data
-        if (index < 0 || index > arr.length) {
-            panic(
-                `Index out of bounds: ${index}, array length is ${arr.length}`,
-            )
-        }
-        arr[index] = value
+    assign(ctx: Context, value: BValue, cb: (err?: Error) => void): void {
+        this.arr.eval(ctx, (arrV, err) => {
+            if (err) return cb(err)
+            const arr = arrV.as(BArray).data
+            this.index.eval(ctx, (indexV, err) => {
+                if (err) return cb(err)
+                const index = indexV.as(BNumber).data
+                if (index < 0 || index > arr.length) {
+                    panic(
+                        `Index out of bounds: ${index}, array length is ${arr.length}`,
+                    )
+                }
+                arr[index] = value
+                cb()
+            })
+        })
     }
 
-    eval(ctx: Context) {
-        const arr = this.arr.eval(ctx).as(BArray).data
-        const index = this.index.eval(ctx).as(BNumber).data
-        if (index < 0 || index > arr.length) {
-            panic(
-                `Index out of bounds: ${index}, array length is ${arr.length}`,
-            )
-        }
-        const value = arr[index]
-        return value
+    eval(ctx: Context, cb: Callback) {
+        this.arr.eval(ctx, (arrV, err) => {
+            if (err) return cb(VOID, err)
+            const arr = arrV.as(BArray).data
+            this.index.eval(ctx, (indexV, err) => {
+                if (err) return cb(VOID, err)
+                const index = indexV.as(BNumber).data
+                if (index < 0 || index > arr.length) {
+                    panic(
+                        `Index out of bounds: ${index}, array length is ${arr.length}`,
+                    )
+                }
+                const value = arr[index]
+                cb(value)
+            })
+        })
     }
 
     toString(): string {

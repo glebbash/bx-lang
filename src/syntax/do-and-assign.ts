@@ -1,8 +1,9 @@
 import { Context } from "../context"
+import { VOID } from "../engine/prelude"
 import { Parser } from "../parser"
 import { BinaryFun } from "../utils/binary-fun"
 import { AssignableExpr } from "./assignable"
-import { Expression } from "./expression"
+import { Callback, Expression } from "./expression"
 import { postfixParser } from "./postfix-op"
 
 export const doAndAssign = (precedence: number, fun: BinaryFun) =>
@@ -20,12 +21,18 @@ export class DoAndAssignExpr implements Expression {
         private fun: BinaryFun,
     ) {}
 
-    eval(ctx: Context) {
-        const value = this.value.eval(ctx)
-        const prev = this.assignable.eval(ctx)
-        const res = this.fun(prev, value)
-        this.assignable.assign(ctx, res)
-        return res
+    eval(ctx: Context, cb: Callback) {
+        this.value.eval(ctx, (value, err) => {
+            if (err) return cb(VOID, err)
+            this.assignable.eval(ctx, (prev, err) => {
+                if (err) return cb(VOID, err)
+                const res = this.fun(prev, value)
+                this.assignable.assign(ctx, res, (err) => {
+                    if (err) return cb(VOID, err)
+                    cb(res)
+                })
+            })
+        })
     }
 
     toString(symbol = "", indent = ""): string {

@@ -1,8 +1,8 @@
-import { readFileSync } from "fs"
+import { readFile, readFileSync } from "fs"
 import { Context, subContext } from "../context"
 import { VOID } from "../engine/prelude"
 import { Parser } from "../parser"
-import { Expression } from "./expression"
+import { Callback, Expression } from "./expression"
 import { expectIdent } from "./ident"
 import { KVPair, OBJECT } from "./object"
 import { PrefixParser } from "./prefix-op"
@@ -19,8 +19,12 @@ export const IMPORT: PrefixParser<ImportExpr> = (parser: Parser) => {
         path += "/"
     }
     if (parser.nextIs({ type: "block_brace" })) {
-        // TODO: check object
-        return new ImportExpr(path, OBJECT(parser, parser.next()).pairs)
+        const objToken = parser.next()
+        const obj = OBJECT(parser, objToken)
+        if (!obj.isValid()) {
+            return parser.unexpectedToken(objToken)
+        }
+        return new ImportExpr(path, obj.pairs)
     }
     return new ImportExpr(path, [[expectIdent(parser).name, null]])
 }
@@ -28,25 +32,35 @@ export const IMPORT: PrefixParser<ImportExpr> = (parser: Parser) => {
 export class ImportExpr implements Expression {
     constructor(private path: string, private pairs: KVPair[]) {}
 
-    eval(ctx: Context) {
-        const file = readFileSync("data/" + this.path + ".bx", {
-            encoding: "utf-8",
-        })
+    eval(ctx: Context, cb: Callback) {
+        readFile(
+            "data/" + this.path + ".bx",
+            { encoding: "utf-8" },
+            (err, file) => {
+                if (err) return cb(VOID, err)
 
-        const importCtx = subContext(ctx)
-        importCtx.scope.exports = new Set()
+                const importCtx = subContext(ctx)
+                importCtx.scope.exports = new Set()
 
-        ctx.core.eval(file, importCtx)
+                ctx.core.eval(
+                    file,
+                    (_, err) => {
+                        if (err) return cb(VOID, err)
 
-        for (const [name, val] of this.pairs) {
-            ctx.scope.define(
-                val?.toString() ?? name,
-                importCtx.scope.get(name),
-                true,
-            )
-        }
-        // TODO: handle varargs import
-        return VOID
+                        for (const [name, val] of this.pairs) {
+                            ctx.scope.define(
+                                val?.toString() ?? name,
+                                importCtx.scope.get(name),
+                                true,
+                            )
+                        }
+
+                        cb(VOID)
+                    },
+                    importCtx,
+                )
+            },
+        )
     }
 
     toString(): string {

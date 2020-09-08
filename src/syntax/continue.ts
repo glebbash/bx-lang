@@ -1,6 +1,7 @@
+import { Context } from "../context"
 import { BContinue } from "../engine/prelude"
 import { Parser } from "../parser"
-import { Expression } from "./expression"
+import { Callback, Expression } from "./expression"
 import { PrefixParser } from "./prefix-op"
 
 export const CONTINUE: PrefixParser<ContinueExpr> = (parser: Parser) => {
@@ -18,8 +19,8 @@ export const CONTINUE: PrefixParser<ContinueExpr> = (parser: Parser) => {
 export class ContinueExpr implements Expression {
     constructor(private times: number) {}
 
-    eval() {
-        return new BContinue(this.times)
+    eval(_ctx: Context, cb: Callback) {
+        cb(new BContinue(this.times))
     }
 
     toString(): string {

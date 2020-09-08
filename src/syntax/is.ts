@@ -1,8 +1,8 @@
 import { Context } from "../context"
-import { bool } from "../engine/prelude"
+import { bool, VOID } from "../engine/prelude"
 import { Token } from "../lexer"
 import { Parser } from "../parser"
-import { Expression } from "./expression"
+import { Callback, Expression } from "./expression"
 import { expectIdent } from "./ident"
 import { postfixParser } from "./postfix-op"
 
@@ -18,8 +18,11 @@ export const is = (precedence: number) =>
 export class IsExpr implements Expression {
     constructor(private val: Expression, private type: string) {}
 
-    eval(ctx: Context) {
-        return bool(this.val.eval(ctx).type === this.type)
+    eval(ctx: Context, cb: Callback) {
+        this.val.eval(ctx, (val, err) => {
+            if (err) return cb(VOID, err)
+            cb(bool(val.type === this.type))
+        })
     }
 
     toString(symbol = "", indent = ""): string {
