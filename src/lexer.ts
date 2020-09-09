@@ -302,7 +302,7 @@ export class Lexer {
                 this.next()
                 return true
             }
-        } else if (this.offset + string.length < this.source.length) {
+        } else if (this.offset + string.length <= this.source.length) {
             const next = this.source.substr(this.offset, string.length)
             if (next === string) {
                 for (let i = 0; i < string.length; i++) {
