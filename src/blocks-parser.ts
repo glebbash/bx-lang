@@ -26,6 +26,7 @@ import { element } from "./syntax/element"
 import { EXPORT } from "./syntax/export"
 import { FOR } from "./syntax/for"
 import { FUN } from "./syntax/fun"
+import { GEN } from "./syntax/gen"
 import { IDENT } from "./syntax/ident"
 import { IF } from "./syntax/if"
 import { IMPORT } from "./syntax/import"
@@ -111,6 +112,8 @@ export class BlocksParser extends Parser<Expression> {
             bool(a.as(BBoolean).data && b.as(BBoolean).data),
         )
 
+        ////
+
         this.postfix.set("<BLOCK_PAREN>", call(prec("<CALL>").moreThan("^")[1]))
         this.postfix.set(
             "<BLOCK_BRACKET>",
@@ -131,22 +134,33 @@ export class BlocksParser extends Parser<Expression> {
         this.doAndAssign(prec("%=").sameAs("="), MOD)
         this.doAndAssign(prec("^=").sameAs("="), POW)
 
+        ////
+
         this.unaryOp("-", (a) => new BNumber(-num(a)))
         this.unaryOp("+", (a) => a)
         this.unaryOp("!", (a) => bool(a !== TRUE))
 
+        ////
+
         this.macro("true", literal(TRUE))
         this.macro("false", literal(FALSE))
+
         this.macro("let", define(false))
         this.macro("const", define(true))
+
         this.macro("if", IF)
+
         this.macro("while", WHILE)
         this.macro("for", FOR)
         this.macro("break", BREAK)
         this.macro("continue", CONTINUE)
-        this.macro("return", RETURN)
-        this.macro("yield", YIELD)
+
         this.macro("fun", FUN)
+        this.macro("return", RETURN)
+
+        this.macro("gen", GEN)
+        this.macro("yield", YIELD)
+
         this.macro("export", EXPORT)
         this.macro("import", IMPORT)
     }

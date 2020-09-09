@@ -1,15 +1,15 @@
 import { Atom, Context, Expression, ExprParser } from "../core"
-import { BYield } from "../engine/prelude"
+import { BPause } from "../engine/prelude"
 
 export const YIELD: Atom<YieldExpr> = (parser: ExprParser) => {
-    return new YieldExpr(parser.parse())
+    return new YieldExpr(parser.parseToEnd())
 }
 
 export class YieldExpr implements Expression {
     constructor(private value: Expression) {}
 
     eval(ctx: Context) {
-        return new BYield(this.value.eval(ctx))
+        return new BPause(this.value.eval(ctx))
     }
 
     toString(symbol = "", indent = ""): string {
