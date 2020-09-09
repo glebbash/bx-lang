@@ -1,3 +1,5 @@
+import { Context } from "../core"
+import { BlockExpr } from "../syntax/block"
 import { panic } from "../utils/panic"
 import { BValue, BWrapper } from "./engine"
 
@@ -65,7 +67,60 @@ export class BContinue extends BWrapper<number> {}
 
 export class BReturn extends BWrapper<BValue> {}
 
-export class BYield extends BWrapper<BValue> {}
+/////////////////
+
+export class BPause extends BWrapper<BValue> {}
+
+export class BStop extends BWrapper<BValue> {}
+
+export type ExecState = {
+    resume(value?: BValue): BValue
+}
+
+export type PausedExec = {
+    execStack: ExecState[]
+    returned: BValue
+}
+
+export class BPausedExec extends BWrapper<PausedExec> {}
+
+export class BGenerator extends BValue {
+    pausedExec: PausedExec = {
+        execStack: [],
+        returned: VOID,
+    }
+    ended = false
+
+    constructor(public ctx: Context, public block: BlockExpr) {
+        super()
+    }
+
+    next(_val?: BValue): BValue {
+        if (this.ended) {
+            return this.pausedExec.returned
+        }
+        const res =
+            this.pausedExec.execStack.length > 0
+                ? this.pausedExec.execStack.pop()!.resume()
+                : this.block.eval(this.ctx)
+
+        if (res.is(BPausedExec)) {
+            this.pausedExec.returned = res.data.returned
+            this.pausedExec.execStack.push(...res.data.execStack)
+        } else {
+            this.ended = true
+            this.pausedExec = {
+                execStack: [],
+                returned: res.is(BReturn) ? res.data : res,
+            }
+        }
+        return this.pausedExec.returned
+    }
+
+    toString() {
+        return "generator"
+    }
+}
 
 /////////////////
 
@@ -82,15 +137,16 @@ export const VOID = new BVoid()
 export type BFunctionBody = (...args: BValue[]) => BValue
 
 export class BFunction extends BWrapper<BFunctionBody> {
-    constructor(body: BFunctionBody, private name?: string) {
+    constructor(body: BFunctionBody) {
         super(body)
     }
+
     call(...args: BValue[]): BValue {
         return this.data(...args)
     }
 
     toString() {
-        return this.name ? `function ${this.name}` : "function"
+        return "function"
     }
 }
 

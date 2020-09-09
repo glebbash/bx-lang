@@ -1,7 +1,14 @@
 import { BlocksParser } from "./blocks-parser"
 import { Context } from "./core"
 import { BValue, Engine } from "./engine/engine"
-import { BArray, BFunction, BString, VOID } from "./engine/prelude"
+import {
+    BArray,
+    BFunction,
+    BGenerator,
+    bool,
+    BString,
+    VOID,
+} from "./engine/prelude"
 import { Scope } from "./engine/scope"
 import { Lexer } from "./lexer"
 
@@ -18,6 +25,13 @@ export class Blocks {
         const Array = this.engine.addType("Array")
         this.engine.addType("Object")
         this.engine.addType("Function")
+        const Generator = this.engine.addType("Generator")
+
+        Generator.addMethod("next", (gen, val?: BValue) => {
+            return gen.as(BGenerator).next(val)
+        }).addMethod("hasNext", (gen) => {
+            return bool(!gen.as(BGenerator).ended)
+        })
 
         Array.addMethod("map", (arr, funV) => {
             const fun = funV.as(BFunction)
