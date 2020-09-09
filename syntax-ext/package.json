@@ -2,7 +2,7 @@
     "name": "blocks",
     "displayName": "Blocks",
     "description": "Blocks language support",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "publisher": "glebbash",
     "engines": {
         "vscode": "^1.0.0"
@@ -11,16 +11,26 @@
         "Programming Languages"
     ],
     "contributes": {
-        "languages": [{
-            "id": "blocks",
-            "aliases": ["Blocks", "blocks"],
-            "extensions": [".bx",".blocks"],
-            "configuration": "./language-configuration.json"
-        }],
-        "grammars": [{
-            "language": "blocks",
-            "scopeName": "source.blocks",
-            "path": "./syntaxes/blocks.tmLanguage.json"
-        }]
+        "languages": [
+            {
+                "id": "blocks",
+                "aliases": [
+                    "Blocks",
+                    "blocks"
+                ],
+                "extensions": [
+                    ".bx",
+                    ".blocks"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "blocks",
+                "scopeName": "source.blocks",
+                "path": "./syntaxes/blocks.tmLanguage.json"
+            }
+        ]
     }
 }
