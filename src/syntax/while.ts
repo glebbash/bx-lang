@@ -12,8 +12,8 @@ export class WhileExpr implements Expression {
     constructor(private cond: Expression, private body: Expression) {}
 
     eval(ctx: Context) {
-        const loopCtx = subContext(ctx)
         while (this.cond.eval(ctx) === TRUE) {
+            const loopCtx = subContext(ctx)
             const res = this.body.eval(loopCtx)
             if (res.is(BBreak)) {
                 if (--res.data !== 0) {

@@ -37,10 +37,10 @@ export class ForExpr implements Expression {
         if (!isIterable(iter)) {
             panic(`${iter} is not iterable`)
         }
-        const forCtx = subContext(ctx)
-        this.binding.define(forCtx, VOID, false)
+
         for (const val of iter) {
-            this.binding.assign(forCtx, val)
+            const forCtx = subContext(ctx)
+            this.binding.define(forCtx, val, false)
             const res = this.body.eval(forCtx)
             if (res.is(BBreak)) {
                 if (--res.data !== 0) {
