@@ -21,13 +21,19 @@ export class Blocks {
     globalScope = new Scope()
 
     constructor(public rootPath: string) {
-        this.engine.addType("Boolean")
-        this.engine.addType("Number")
-        this.engine.addType("String")
-        const Array = this.engine.addType("Array")
-        this.engine.addType("Object")
-        this.engine.addType("Function")
-        const Generator = this.engine.addType("Generator")
+        const Any = this.engine.addType("Any")
+        this.engine.addType("Boolean", "Any")
+        this.engine.addType("Number", "Any")
+        this.engine.addType("String", "Any")
+        const Array = this.engine.addType("Array", "Any")
+        this.engine.addType("Object", "Any")
+        this.engine.addType("Function", "Any")
+        const Generator = this.engine.addType("Generator", "Function")
+
+        Any.addMethod("also", (val, fun) => {
+            fun.as(BFunction).call(val)
+            return val
+        })
 
         Generator.addMethod("next", (gen, val?: BValue) => {
             return gen.as(BGenerator).next(val)

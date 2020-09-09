@@ -1,28 +1,26 @@
 const tests = [
-    "generator",
-    "array",
-    "assign",
-    "comments",
-    "continue_break",
-    "import",
-    "fact",
-    "for",
-    "fun",
-    "if",
-    "indent",
-    "is",
-    "object",
-    "string_fmt",
+    "generator"
+    "array"
+    "assign"
+    "comments"
+    "continue_break"
+    "import"
+    "fact"
+    "for"
+    "fun"
+    "if"
+    "indent"
+    "is"
+    "object"
+    "string_fmt"
     "while"
+    "also"
 ]
 
 const stars = "*" * 25
 
 for (test in tests) {
-    print(stars)
-    print(test)
-    print(stars)
+    print("{}\n{}\n{}" % [stars, test, stars])
     require("tests." + test)
-    print(stars)
-    print("")
+    print(stars + "\n")
 }
