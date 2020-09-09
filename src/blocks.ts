@@ -1,3 +1,4 @@
+import { readFileSync } from "fs"
 import { BlocksParser } from "./blocks-parser"
 import { Context } from "./core"
 import { BValue, Engine } from "./engine/engine"
@@ -5,6 +6,7 @@ import {
     BArray,
     BFunction,
     BGenerator,
+    BObject,
     bool,
     BString,
     VOID,
@@ -18,7 +20,7 @@ export class Blocks {
     engine = new Engine()
     globalScope = new Scope()
 
-    constructor() {
+    constructor(public rootPath: string) {
         this.engine.addType("Boolean")
         this.engine.addType("Number")
         this.engine.addType("String")
@@ -60,16 +62,35 @@ export class Blocks {
             }),
         )
         this.globalScope.define(
-            "pp",
-            new BFunction((val) => {
-                const expr = val.as(BString).data
-                return new BString(this.prettyPrint(expr))
+            "require",
+            new BFunction((pathV) => {
+                const path = pathV.as(BString).data
+
+                const importCtx: Context = {
+                    scope: new Scope(this.globalScope, new Set()),
+                    core: this,
+                }
+                this.evalFile(path, importCtx)
+
+                const obj = new BObject({})
+                for (const key of importCtx.scope.exports!) {
+                    obj.data[key] = importCtx.scope.get(key)
+                }
+                return obj
             }),
             true,
         )
     }
 
-    eval(source: string, ctx?: Context) {
+    evalFile(path: string, ctx?: Context): BValue {
+        const filePath = this.rootPath + "/" + path.replace(".", "/") + ".bx"
+        const file = readFileSync(filePath, {
+            encoding: "utf-8",
+        })
+        return this.eval(file, ctx)
+    }
+
+    eval(source: string, ctx?: Context): BValue {
         const tokens = this.lexer.tokenize(source)
         const exprs = this.parser.parseAll(tokens)
         const context: Context = ctx ?? {

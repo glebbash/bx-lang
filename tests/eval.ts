@@ -1,6 +1,4 @@
-import { readFileSync } from "fs"
 import { Blocks } from "../src/blocks"
 
-const data = readFileSync("data/main.bx", { encoding: "utf-8" })
-const core = new Blocks()
-core.eval(data)
+const core = new Blocks(process.cwd() + "/data")
+core.evalFile("main")

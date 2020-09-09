@@ -1,4 +1,3 @@
-import { readFileSync } from "fs"
 import { Atom, Context, Expression, ExprParser, subContext } from "../core"
 import { VOID } from "../engine/prelude"
 import { expectIdent } from "./ident"
@@ -13,7 +12,7 @@ export const IMPORT: Atom<ImportExpr> = (parser: ExprParser) => {
             break
         }
         parser.expect({ value: "." })
-        path += "/"
+        path += "."
     }
     if (parser.nextIs({ type: "block_brace" })) {
         // TODO: check object
@@ -26,14 +25,10 @@ export class ImportExpr implements Expression {
     constructor(private path: string, private pairs: KVPair[]) {}
 
     eval(ctx: Context) {
-        const file = readFileSync("data/" + this.path + ".bx", {
-            encoding: "utf-8",
-        })
-
         const importCtx = subContext(ctx)
         importCtx.scope.exports = new Set()
 
-        ctx.core.eval(file, importCtx)
+        ctx.core.evalFile(this.path, importCtx)
 
         for (const [name, val] of this.pairs) {
             ctx.scope.define(

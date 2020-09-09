@@ -1,15 +1,28 @@
-import tests.generator::{}
-// import tests.array::{}
-// import tests.assign::{}
-// import tests.comments::{}
-// import tests.continue_break::{}
-// import tests.import::{}
-// import tests.fact::{}
-// import tests.for::{}
-// import tests.fun::{}
-// import tests.if::{}
-// import tests.indent::{}
-// import tests.is::{}
-// import tests.object::{}
-// import tests.string_fmt::{}
-// import tests.while::{}
+const tests = [
+    "generator",
+    "array",
+    "assign",
+    "comments",
+    "continue_break",
+    "import",
+    "fact",
+    "for",
+    "fun",
+    "if",
+    "indent",
+    "is",
+    "object",
+    "string_fmt",
+    "while"
+]
+
+const stars = "*" * 25
+
+for (test in tests) {
+    print(stars)
+    print(test)
+    print(stars)
+    require("tests." + test)
+    print(stars)
+    print("")
+}
