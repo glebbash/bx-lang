@@ -99,22 +99,44 @@ export class BGenerator extends BValue {
         if (this.ended) {
             return this.pausedExec.returned
         }
-        const res =
-            this.pausedExec.execStack.length > 0
-                ? this.pausedExec.execStack.pop()!.resume()
-                : this.block.eval(this.ctx)
 
-        if (res.is(BPausedExec)) {
-            this.pausedExec.returned = res.data.returned
-            this.pausedExec.execStack.push(...res.data.execStack)
-        } else {
-            this.ended = true
-            this.pausedExec = {
-                execStack: [],
-                returned: res.is(BReturn) ? res.data : res,
+        // first run
+        if (this.pausedExec.execStack.length === 0) {
+            const res = this.block.eval(this.ctx)
+            if (res.is(BPausedExec)) {
+                this.pauseOn(res)
+            } else {
+                this.endOn(res)
+            }
+            return this.pausedExec.returned
+        }
+
+        let res = this.pausedExec.returned
+        while (true) {
+            res = this.pausedExec.execStack.pop()!.resume(res)
+            if (res.is(BPausedExec)) {
+                this.pauseOn(res)
+                break
+            }
+            if (this.pausedExec.execStack.length === 0) {
+                this.endOn(res)
+                break
             }
         }
         return this.pausedExec.returned
+    }
+
+    private pauseOn(pe: BPausedExec) {
+        this.pausedExec.returned = pe.data.returned
+        this.pausedExec.execStack.push(...pe.data.execStack)
+    }
+
+    private endOn(val: BValue) {
+        this.ended = true
+        this.pausedExec = {
+            execStack: [],
+            returned: val.is(BReturn) ? val.data : val,
+        }
     }
 
     toString() {

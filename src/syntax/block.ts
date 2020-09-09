@@ -5,7 +5,6 @@ import {
     BContinue,
     BPausedExec,
     BReturn,
-    BPause,
     ExecState,
     VOID,
 } from "../engine/prelude"
@@ -36,9 +35,9 @@ export const BLOCK: Atom<BlockExpr> = (parser: ExprParser, token: Token) => {
 
 export class BlockExecState implements ExecState {
     constructor(
-        private ctx: Context,
-        private block: BlockExpr,
-        private line: number,
+        public ctx: Context,
+        public block: BlockExpr,
+        public line: number,
     ) {}
 
     resume(value?: BValue): BValue {
@@ -53,13 +52,10 @@ export class BlockExpr implements Expression {
         for (const len = this.body.length; line < len; line++) {
             const expr = this.body[line]
             res = expr.eval(ctx)
-            if (res.is(BPause)) {
-                return new BPausedExec({
-                    returned: res.data,
-                    execStack: [new BlockExecState(ctx, this, line + 1)],
-                })
-            } else if (res.is(BPausedExec)) {
-                res.data.execStack.unshift(new BlockExecState(ctx, this, line + 1))
+            if (res.is(BPausedExec)) {
+                res.data.execStack.unshift(
+                    new BlockExecState(ctx, this, line + 1),
+                )
                 return res
             }
             if (res.is(BReturn) || res.is(BBreak) || res.is(BContinue)) {

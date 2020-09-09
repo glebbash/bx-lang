@@ -1,14 +1,15 @@
-import tests.array::{}
-import tests.assign::{}
-import tests.comments::{}
-import tests.continue_break::{}
-import tests.import::{}
-import tests.fact::{}
-import tests.for::{}
-import tests.fun::{}
-import tests.if::{}
-import tests.indent::{}
-import tests.is::{}
-import tests.object::{}
-import tests.string_fmt::{}
-import tests.while::{}
+import tests.generator::{}
+// import tests.array::{}
+// import tests.assign::{}
+// import tests.comments::{}
+// import tests.continue_break::{}
+// import tests.import::{}
+// import tests.fact::{}
+// import tests.for::{}
+// import tests.fun::{}
+// import tests.if::{}
+// import tests.indent::{}
+// import tests.is::{}
+// import tests.object::{}
+// import tests.string_fmt::{}
+// import tests.while::{}
