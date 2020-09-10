@@ -89,7 +89,7 @@ export class Blocks {
     }
 
     evalFile(path: string, ctx?: Context): BValue {
-        const filePath = this.rootPath + "/" + path.replace(".", "/") + ".bx"
+        const filePath = this.rootPath + "/" + path.replace(/\./g, "/") + ".bx"
         const file = readFileSync(filePath, {
             encoding: "utf-8",
         })

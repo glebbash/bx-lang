@@ -43,7 +43,7 @@ export class ImportExpr implements Expression {
 
     toString(): string {
         // TODO: handle varargs and named imports
-        return `import ${this.path.replace("/", ".")}::${this.pairs
+        return `import ${this.path}::${this.pairs
             .map(([k]) => k)
             .join(", ")}`
     }
