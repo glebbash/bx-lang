@@ -160,7 +160,7 @@ export class Lexer {
             this.panicUnexpected()
         }
         if ('"' === this.char || "'" === this.char) {
-            return this.token("string", () => this.string())
+            return this.token("string", () => this.string(this.char!))
         }
         const bracketInfo = this.config.bracketed[this.char]
         if (bracketInfo !== undefined) {
@@ -215,8 +215,11 @@ export class Lexer {
         return buff
     }
 
-    private string(): string {
-        const ending = this.char!
+    private string(ending: string): string {
+        const multiEnding = ending.repeat(3)
+        if (this.skipSequence(multiEnding + "\n")) {
+            return this.multilineString(multiEnding)
+        }
         let buff = ending
         while (true) {
             this.nextExceptEof()
@@ -237,6 +240,16 @@ export class Lexer {
                 return buff
             }
             buff += this.char
+        }
+    }
+
+    private multilineString(ending: string): string {
+        let buffer = ending[0] + this.char!
+        while (true) {
+            if (this.skipSequence(ending)) {
+                return processML(buffer)
+            }
+            buffer += this.nextExceptEof()
         }
     }
 
@@ -392,4 +405,10 @@ export class Lexer {
     private pos(): Position {
         return [this.row, this.col]
     }
+}
+
+function processML(string: string): string {
+    const lines = string.split("\n")
+    const padLength = lines.pop()!.length - 1
+    return lines.map((l) => l.slice(padLength)).join("\n") + "\n"
 }

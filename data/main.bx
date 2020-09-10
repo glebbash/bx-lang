@@ -15,6 +15,7 @@ const tests = [
     "string_fmt"
     "while"
     "also"
+    "ml_string"
 ]
 
 const stars = "*" * 25
