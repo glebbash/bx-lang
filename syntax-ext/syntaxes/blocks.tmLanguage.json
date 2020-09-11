@@ -79,7 +79,7 @@
 			"patterns": [
 				{
 					"name": "keyword.control.blocks",
-					"match": "(?<!\\.)\\b(if|else|while|for|break|continue|fun|return|gen|yield|in|is|class|import|export|and|or)\\b"
+					"match": "(?<!\\.)\\b(if|else|while|for|break|continue|fun|return|gen|yield|async|await|in|is|class|import|export|and|or)\\b"
 				},
 				{
 					"name": "storage.type.blocks",
