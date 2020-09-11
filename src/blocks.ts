@@ -6,6 +6,7 @@ import {
     BArray,
     BFunction,
     BGenerator,
+    BNumber,
     BObject,
     bool,
     BString,
@@ -85,6 +86,18 @@ export class Blocks {
                 return obj
             }),
             true,
+        )
+        this.globalScope.define(
+            "type",
+            new BFunction((val) => new BString(val.type)),
+        )
+        this.globalScope.define(
+            "Parse",
+            new BObject({
+                number: new BFunction((str) => {
+                    return new BNumber(Number(str.as(BString).data))
+                }),
+            }),
         )
     }
 
