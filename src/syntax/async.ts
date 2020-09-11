@@ -1,6 +1,6 @@
 import { Atom, Context, Expression, ExprParser, subContext } from "../core"
 import { BValue } from "../engine/engine"
-import { async, BAsyncFunction, BFunction, BGenerator, VOID } from "../engine/prelude"
+import { async, BAsyncFunction, BFunction, VOID } from "../engine/prelude"
 import { panic } from "../utils/panic"
 import { syntaxError } from "../utils/syntax-error"
 import { ARRAY } from "./array"

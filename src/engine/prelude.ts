@@ -85,7 +85,7 @@ export class BPausedExec extends BWrapper<PausedExec> {
     }
 }
 
-export class BGenerator extends BValue {
+export class BGenerator extends BValue implements Generator<BValue> {
     pausedExec: PausedExec = {
         execStack: [],
         returned: VOID,
@@ -97,7 +97,7 @@ export class BGenerator extends BValue {
         super()
     }
 
-    next(val?: BValue): BValue {
+    nextValue(val?: BValue): BValue {
         if (this.ended) {
             return this.pausedExec.returned
         }
@@ -143,6 +143,23 @@ export class BGenerator extends BValue {
             returned: val.is(BReturn) ? val.data : val,
             async: false,
         }
+    }
+
+    next(): IteratorResult<BValue, any> {
+        const value = this.nextValue()
+        return { done: this.ended, value }
+    }
+
+    return(): IteratorResult<BValue, any> {
+        throw new Error("Method not implemented.")
+    }
+
+    throw(): IteratorResult<BValue, any> {
+        throw new Error("Method not implemented.")
+    }
+
+    [Symbol.iterator](): Generator<BValue, any, unknown> {
+        return this
     }
 
     toString() {

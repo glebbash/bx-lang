@@ -37,7 +37,7 @@ export class Blocks {
         })
 
         Generator.addMethod("next", (gen, val?: BValue) => {
-            return gen.as(BGenerator).next(val)
+            return gen.as(BGenerator).nextValue(val)
         }).addMethod("hasNext", (gen) => {
             return bool(!gen.as(BGenerator).ended)
         })
@@ -68,6 +68,9 @@ export class Blocks {
                 return VOID
             }),
         )
+        this.globalScope.define("time", new BFunction(() => {
+            return new BNumber(new Date().getTime())
+        }))
         this.globalScope.define("exit", new BFunction((val) => {
             process.exit(val?.as(BNumber)?.data)
         }))
