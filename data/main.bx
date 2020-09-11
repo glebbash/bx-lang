@@ -16,6 +16,11 @@ const tests = [
     "while"
     "also"
     "ml_string"
+    "parse_number"
+    "type"
+    // "yield_back"
+    // "yield_back_1"
+    // "async"
 ]
 
 const stars = "*" * 25

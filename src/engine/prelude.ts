@@ -69,10 +69,6 @@ export class BReturn extends BWrapper<BValue> {}
 
 /////////////////
 
-export class BPause extends BWrapper<BValue> {}
-
-export class BStop extends BWrapper<BValue> {}
-
 export type ExecState = {
     resume(value?: BValue): BValue
 }
@@ -80,14 +76,20 @@ export type ExecState = {
 export type PausedExec = {
     execStack: ExecState[]
     returned: BValue
+    async: boolean
 }
 
-export class BPausedExec extends BWrapper<PausedExec> {}
+export class BPausedExec extends BWrapper<PausedExec> {
+    toString() {
+        return "pausedExec(" + this.data.returned + ")"
+    }
+}
 
 export class BGenerator extends BValue {
     pausedExec: PausedExec = {
         execStack: [],
         returned: VOID,
+        async: false,
     }
     ended = false
 
@@ -95,7 +97,7 @@ export class BGenerator extends BValue {
         super()
     }
 
-    next(_val?: BValue): BValue {
+    next(val?: BValue): BValue {
         if (this.ended) {
             return this.pausedExec.returned
         }
@@ -111,7 +113,7 @@ export class BGenerator extends BValue {
             return this.pausedExec.returned
         }
 
-        let res = this.pausedExec.returned
+        let res = val
         while (true) {
             res = this.pausedExec.execStack.pop()!.resume(res)
             if (res.is(BPausedExec)) {
@@ -127,6 +129,9 @@ export class BGenerator extends BValue {
     }
 
     private pauseOn(pe: BPausedExec) {
+        if (pe.data.async) {
+            panic("await outside of async")
+        }
         this.pausedExec.returned = pe.data.returned
         this.pausedExec.execStack.push(...pe.data.execStack)
     }
@@ -136,11 +141,96 @@ export class BGenerator extends BValue {
         this.pausedExec = {
             execStack: [],
             returned: val.is(BReturn) ? val.data : val,
+            async: false,
         }
     }
 
     toString() {
         return "generator"
+    }
+}
+
+export function async(af: BAsyncFunction): BFunction {
+    return new BFunction((cb) => {
+        af.call(cb.as(BFunction))
+        return VOID
+    })
+}
+
+export class BAsyncFunction extends BValue {
+    pausedExec: PausedExec = {
+        execStack: [],
+        returned: VOID,
+        async: true,
+    }
+    ended = false
+
+    constructor(public ctx: Context, public block: BlockExpr) {
+        super()
+    }
+
+    call(cb: BFunction, val?: BValue): BValue {
+        const ret = this.next(val)
+        if (this.ended) {
+            return cb.call(ret)
+        }
+        return ret.as(BFunction).call(
+            new BFunction((val) => {
+                return this.call(cb, val)
+            }),
+        )
+    }
+
+    next(val?: BValue): BValue {
+        if (this.ended) {
+            return this.pausedExec.returned
+        }
+
+        // first run
+        if (this.pausedExec.execStack.length === 0) {
+            const res = this.block.eval(this.ctx)
+            if (res.is(BPausedExec)) {
+                this.pauseOn(res)
+            } else {
+                this.endOn(res)
+            }
+            return this.pausedExec.returned
+        }
+
+        let res = val
+        while (true) {
+            res = this.pausedExec.execStack.pop()!.resume(res)
+            if (res.is(BPausedExec)) {
+                this.pauseOn(res)
+                break
+            }
+            if (this.pausedExec.execStack.length === 0) {
+                this.endOn(res)
+                break
+            }
+        }
+        return this.pausedExec.returned
+    }
+
+    private pauseOn(pe: BPausedExec) {
+        if (!pe.data.async) {
+            panic("yield outside of generator")
+        }
+        this.pausedExec.returned = pe.data.returned
+        this.pausedExec.execStack.push(...pe.data.execStack)
+    }
+
+    private endOn(val: BValue) {
+        this.ended = true
+        this.pausedExec = {
+            execStack: [],
+            returned: val.is(BReturn) ? val.data : val,
+            async: true,
+        }
+    }
+
+    toString() {
+        return "asyncFunction"
     }
 }
 

@@ -14,6 +14,8 @@ import {
 import { Parser } from "./parser"
 import { ARRAY } from "./syntax/array"
 import { assign } from "./syntax/assign"
+import { ASYNC } from "./syntax/async"
+import { AWAIT } from "./syntax/await"
 import { binaryOp } from "./syntax/binary-op"
 import { BREAK } from "./syntax/break"
 import { call } from "./syntax/call"
@@ -160,6 +162,9 @@ export class BlocksParser extends Parser<Expression> {
 
         this.macro("gen", GEN)
         this.macro("yield", YIELD)
+
+        this.macro("async", ASYNC)
+        this.macro("await", AWAIT)
 
         this.macro("export", EXPORT)
         this.macro("import", IMPORT)

@@ -1,22 +1,22 @@
 import { Atom, Context, Expression, ExprParser } from "../core"
 import { BPausedExec } from "../engine/prelude"
 
-export const YIELD: Atom<YieldExpr> = (parser: ExprParser) => {
-    return new YieldExpr(parser.parseToEnd())
+export const AWAIT: Atom<AwaitExpr> = (parser: ExprParser) => {
+    return new AwaitExpr(parser.parseToEnd())
 }
 
-export class YieldExpr implements Expression {
+export class AwaitExpr implements Expression {
     constructor(private value: Expression) {}
 
     eval(ctx: Context) {
         return new BPausedExec({
             returned: this.value.eval(ctx),
             execStack: [],
-            async: false,
+            async: true,
         })
     }
 
     toString(symbol = "", indent = ""): string {
-        return `yield ${this.value.toString(symbol, indent)}`
+        return `await ${this.value.toString(symbol, indent)}`
     }
 }
