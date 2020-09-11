@@ -3,7 +3,6 @@ import { BValue } from "../engine/engine"
 import {
     BBreak,
     BContinue,
-    BPause,
     BPausedExec,
     BReturn,
     ExecState,
@@ -11,7 +10,7 @@ import {
 } from "../engine/prelude"
 import { panic } from "../utils/panic"
 import { AssignableExpr, isAssignable } from "./assignable"
-import { BlockExecState, blockOrExpr } from "./block"
+import { blockOrExpr } from "./block"
 import { parenExpr } from "./paren"
 
 export const FOR: Atom<ForExpr> = (parser: ExprParser) => {

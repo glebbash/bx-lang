@@ -7,7 +7,8 @@ export const assign = (precedence: number) =>
             return parser.unexpectedToken(token)
         }
         // right associative
-        return new AssignExpr(assignable, parser.parse(precedence - 1))
+        const value = parser.parse(precedence - 1)
+        return new AssignExpr(assignable, value)
     })
 
 export class AssignExpr implements Expression {
