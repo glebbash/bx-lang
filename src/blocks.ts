@@ -68,6 +68,9 @@ export class Blocks {
                 return VOID
             }),
         )
+        this.globalScope.define("exit", new BFunction((val) => {
+            process.exit(val?.as(BNumber)?.data)
+        }))
         this.globalScope.define(
             "require",
             new BFunction((pathV) => {
