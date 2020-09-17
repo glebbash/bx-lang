@@ -77,7 +77,7 @@ export class Lexer {
 
         const exprs: Tokens[] = []
         while (true) {
-            const comments: Token[] = []
+            const comments: Tokens = []
             this.skipWhiteSpace(comments)
             if (comments.length > 0) exprs.push(comments)
 
