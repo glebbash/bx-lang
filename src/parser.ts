@@ -119,7 +119,7 @@ export class Parser<E> {
         if (!this.nextIs(cond)) {
             this.unexpectedToken(this.nextToken(false))
         }
-        return this.next() as any
+        return this.next()
     }
 
     nextIs(cond: TokenCondition): boolean {
