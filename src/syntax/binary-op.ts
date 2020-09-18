@@ -24,7 +24,9 @@ export class BinaryOpExpr implements Expression {
         return value
     }
 
-    toString(_symbol = "", indent = ""): string {
-        return `${indent}${this.expr1} ${this.operator} ${this.expr2}`
+    toString(symbol = "", indent = ""): string {
+        return `${this.expr1.toString(symbol, indent)} ${
+            this.operator
+        } ${this.expr2.toString(symbol, indent)}`
     }
 }
